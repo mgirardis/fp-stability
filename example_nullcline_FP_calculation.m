@@ -13,6 +13,7 @@ addpath func
 
 %% creates a set of parameters for the KTtanh map
 % sets K = 0.6, T = 0.2, and H is the parameter over which we will trace the bifurcation diagram
+% H is divided in 1000 points from -0.15 to 0.15
 par = getKTzParamStruct(0.6,0.2,0,0,0,linspace(-0.15,0.15,1000));
 
 %% calculates the FP of the KTtanh map

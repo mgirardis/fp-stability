@@ -46,7 +46,8 @@ title(ax,'Bifurcation over H for KT Tanh map');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% creates a set of parameters for the KTtanh map
-% sets K = 0.6, T = 0.2, and H is the parameter over which we will trace the bifurcation diagram
+% sets K = 0.6, T = 0.1, delta=lambda=0.001, and xR is the parameter over which we will trace the bifurcation diagram
+% xR is divided in 1000 points between -0.8 and 0
 par = getKTzParamStruct(0.6,0.1,0.001,0.001,linspace(-0.8,0,1000),0);
 
 %% calculates the FP of the KTtanh map

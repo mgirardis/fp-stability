@@ -1,7 +1,53 @@
-function fp = getFixedPoints(par,fp,Lambda)
+function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames)
+% par -> a struct with the parameters of the model (one of which may be a vector to use as a parameter for bifurcation)
+% fp -> a struct with fields xS,yS,zS or a function handle to a function that returns xS,yS,zS (yS and zS are not necessary)
+%     if fp is a truct:
+%         fp.xS -> a numeric array with the values of the FP xS over the parameter range spanned by par
+%                  or a cell array, in which each cell is a different FP on top of the range spanned by par
+%                  (the same applies for yS and zS if they are present)
+%     if fp is a function_handle, it must return xS,yS and zS according to the specification above
+% Lambda -> the eigenvalues associated with xS,yS,zS or a function handle that returns these eigenvalues 
+%     if xS is a cell, Lambda must be a cell of same size
+%     each element of the cell Lambda must be a matrix with n rows, where n is the dimensionality of the FP (i.e. 1 if only xS, 2 if xS and yS, 3 if xS,yS,zS)
+%     if Lambda is a numeric array, it must match the size of xS
+% fpFuncArgs -> a cell of additional arguments to be passed to fp(par,fpFuncArgs{:}) if fp is function_handle
+% LambdaFuncArgs -> a cell of additional arguments to be passed to Lambda(par,LambdaFuncArgs{:}) if Lambda is function_handle
+%
+    if (nargin < 4) || isempty(fpFuncArgs)
+        fpFuncArgs = {};
+    end
+    if (nargin < 5) || isempty(LambdaFuncArgs)
+        LambdaFuncArgs = {};
+    end
+    if (nargin < 6) || isempty(fpNames)
+        fpNames = 'x^*,y^*,z^*';
+    end
+    assert(isValidFP(fp),'Invalid value for fp: it must be either a struct with fields xS,yS,zS or a function handle that returns fp struct with fields xS,yS,zS');
+    assert(isValidEV(Lambda),'Invalid value for Lambda: it must be either a numeric matrix (num of lines must match the dimension of the FP) or a function handle that returns a FP_dim X n matrix')
+    
     [bif_param,bif_param_name] = GetBifPar(par);
+    
+    if isa(fp,'function_handle')
+        fp = fp(par,fpFuncArgs{:});
+    end
+    fp = ensure_cell_fp(fp);
+    
+    if isa(Lambda,'function_handle')
+        par = insert_fp_into_struct(par,fp);
+        Lambda = Lambda(par,LambdaFuncArgs{:});
+    end
+    Lambda = ensure_cell(Lambda);
+    
+    if isfield(fp,'fpName')
+        fpName = fp.fpNname;
+    else
+        fpName = fpNames;
+    end
+    has_yS = isfield(fp,'yS');
+    has_zS = isfield(fp,'zS');
     parWindow = 1;
     x = {};
+    y = {};
     z = {};
     p = {};
     e = {};
@@ -15,19 +61,80 @@ function fp = getFixedPoints(par,fp,Lambda)
         end
         % this is where the trick happens
         % we just use FP that are not NaN's
-        [xx,zz,pp,ee,tt] = splitFP_EV(fp.xS{j}(~k),fp.zS{j}(~k),bif_param(~k),Lambda{j}(:,~k),parWindow);
+        if has_yS
+            yS_temp = fp.yS{j}(~k);
+        else
+            yS_temp = false;
+        end
+        if has_zS
+            zS_temp = fp.zS{j}(~k);
+        else
+            zS_temp = false;
+        end
+        [xx,yy,zz,pp,ee,tt] = splitFP_EV(fp.xS{j}(~k),yS_temp,zS_temp,bif_param(~k),Lambda{j}(:,~k),parWindow);
         
         % just separate the fp returned by the above function into their own cell
-        x((numel(x)+1):(numel(x)+numel(xx))) = xx;
-        z((numel(z)+1):(numel(z)+numel(zz))) = zz;
-        p((numel(p)+1):(numel(p)+numel(pp))) = pp;
-        e((numel(e)+1):(numel(e)+numel(ee))) = ee;
-        t((numel(t)+1):(numel(t)+numel(tt))) = tt;
+        x = expandVector(x,xx);
+        y = expandVector(y,yy);
+        z = expandVector(z,zz);
+        p = expandVector(p,pp);
+        e = expandVector(e,ee);
+        t = expandVector(t,tt);
+%         x((numel(x)+1):(numel(x)+numel(xx))) = xx;
+%         y((numel(y)+1):(numel(y)+numel(yy))) = yy;
+%         z((numel(z)+1):(numel(z)+numel(zz))) = zz;
+%         p((numel(p)+1):(numel(p)+numel(pp))) = pp;
+%         e((numel(e)+1):(numel(e)+numel(ee))) = ee;
+%         t((numel(t)+1):(numel(t)+numel(tt))) = tt;
     end
 
     y = x; % y* = x* in KT(z)
-    fp = struct('xS', x, 'yS', y, 'zS', z, 'ev', e, 'type', t, 'par', p, 'parName', bif_param_name, 'fpName', 'x^*,y^*,z^*', 'fixedParam', par);
+    fp = struct('xS', x, 'yS', y, 'zS', z, 'ev', e, 'type', t, 'par', p, 'parName', bif_param_name, 'fpName', fpName, 'fixedParam', par);
     fp = eliminateEqualFP(fp);
+end
+
+function r = isValidFP(fp)
+    r = isfield(fp,'xS') || isa(fp,'function_handle');
+end
+
+function r = isValidEV(ev)
+    r = iscell(ev) || (isnumeric(ev) && ismatrix(ev)) || isa(ev,'function_handle');
+end
+
+function v = expandVector(v,vv)
+    v((numel(v)+1):(numel(v)+numel(vv))) = vv;
+end
+
+function x = ensure_cell(x)
+    if ~iscell(x)
+        x = {x};
+    end
+end
+
+function fp = ensure_cell_fp(fp)
+    fp.xS = ensure_cell(fp.xS);
+    if isfield(fp,'yS')
+        fp.yS = ensure_cell(fp.yS);
+    end
+    if isfield(fp,'zS')
+        fp.zS = ensure_cell(fp.zS);
+    end
+end
+
+function par = insert_fp_into_struct(par,fp)
+    if ~isfield(par,'xS')
+        par.xS = fp.xS;
+    end
+    if ~isfield(par,'yS')
+        if isfield(fp,'yS')
+            par.yS = fp.yS;
+        end
+    end
+    if ~isfield(par,'zS')
+        if isfield(fp,'zS')
+            par.zS = fp.zS;
+        end
+    end
 end
 
 function fp = eliminateEqualFP(fp)
@@ -53,18 +160,24 @@ function r = isEqualFP(fp1,fp2)
 end
 
 
-function [x,z,p,e,t] = splitFP_EV(xSTemp,yS_or_zS_Temp,pTemp,evTemp,parWindow)
+function [x,y,z,p,e,t] = splitFP_EV(xSTemp,ySTemp,zSTemp,pTemp,evTemp,parWindow)
 % this function splits the FP into cell arrays
 % according to FP stability
     [ind, type] = getFPTypeInterval(evTemp,parWindow); % <- this is the magical function
     x = cell(1,numel(ind));
+    y = cell(1,numel(ind));
     z = cell(1,numel(ind));
     p = cell(1,numel(ind));
     e = cell(1,numel(ind));
     t = cell(1,numel(ind));
     for m = 1:numel(ind)
         x{m} = xSTemp(ind{m});
-        z{m} = yS_or_zS_Temp(ind{m});
+        if ~islogical(ySTemp)
+            y{m} = ySTemp(ind{m});
+        end
+        if ~islogical(zSTemp)
+            z{m} = zSTemp(ind{m});
+        end
         p{m} = pTemp(ind{m});
         e{m} = evTemp(:,ind{m});
         t{m} = type{m};

@@ -30,7 +30,7 @@ function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames)
     if isa(fp,'function_handle')
         fp = fp(par,fpFuncArgs{:});
     end
-    fp = ensure_cell_fp(fp);
+    fp = ensure_cell_fp(ensure_yS_zS(fp));
     
     if isa(Lambda,'function_handle')
         par = insert_fp_into_struct(par,fp);
@@ -43,8 +43,7 @@ function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames)
     else
         fpName = fpNames;
     end
-    has_yS = isfield(fp,'yS');
-    has_zS = isfield(fp,'zS');
+    
     parWindow = 1;
     x = {};
     y = {};
@@ -61,17 +60,7 @@ function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames)
         end
         % this is where the trick happens
         % we just use FP that are not NaN's
-        if has_yS
-            yS_temp = fp.yS{j}(~k);
-        else
-            yS_temp = false;
-        end
-        if has_zS
-            zS_temp = fp.zS{j}(~k);
-        else
-            zS_temp = false;
-        end
-        [xx,yy,zz,pp,ee,tt] = splitFP_EV(fp.xS{j}(~k),yS_temp,zS_temp,bif_param(~k),Lambda{j}(:,~k),parWindow);
+        [xx,yy,zz,pp,ee,tt] = splitFP_EV(fp.xS{j}(~k),fp.yS{j}(~k),fp.zS{j}(~k),bif_param(~k),Lambda{j}(:,~k),parWindow);
         
         % just separate the fp returned by the above function into their own cell
         x = expandVector(x,xx);
@@ -91,6 +80,15 @@ function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames)
     y = x; % y* = x* in KT(z)
     fp = struct('xS', x, 'yS', y, 'zS', z, 'ev', e, 'type', t, 'par', p, 'parName', bif_param_name, 'fpName', fpName, 'fixedParam', par);
     fp = eliminateEqualFP(fp);
+end
+
+function fp = ensure_yS_zS(fp)
+    if ~isfield(fp,'yS')
+        fp.yS = fp.xS;
+    end
+    if ~isfield(fp,'zS')
+        fp.zS = fp.xS;
+    end
 end
 
 function r = isValidFP(fp)
@@ -154,6 +152,7 @@ function r = isEqualFP(fp1,fp2)
     r = false;
     if (numel(fp1.xS) == numel(fp2.xS)) && strcmpi(fp1.type,fp2.type) % the fps have the same amount of values in their domains and are of the same type
         r = all( abs(fp1.xS - fp2.xS) < 1e-10 ) &&... % the values of all xS are equal (within 1e-10 error)
+            all( abs(fp1.yS - fp2.yS) < 1e-10 ) &&... % the values of all yS are equal (within 1e-10 error)
             all( abs(fp1.zS - fp2.zS) < 1e-10 ) &&... % the values of all zS are equal (within 1e-10 error)
             (fp1.par(1) == fp2.par(1)) && (fp1.par(end) == fp2.par(end)); % the parameter domain is the same
     end

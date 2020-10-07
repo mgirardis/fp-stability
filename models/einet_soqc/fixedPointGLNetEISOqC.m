@@ -1,6 +1,6 @@
 function fp = fixedPointGLNetEISOqC(par, s, r)
     if isscalar(s) && isscalar(r)
-        [xS,yS,zS] = fixedPointKTLog_internal(par, s, r);
+        [xS,yS,zS] = fixedPointGLNetEISOqC_internal(par, s, r);
     else
         n = max([numel(r),numel(s)]);
         s = ones(1,n).*s;
@@ -9,7 +9,7 @@ function fp = fixedPointGLNetEISOqC(par, s, r)
         yS = cell(1,n);
         zS = cell(1,n);
         for i = 1:n
-            [xS{i},yS{i},zS{i}] = fixedPointGLNetEI_internal(par, s(i), r(i));
+            [xS{i},yS{i},zS{i}] = fixedPointGLNetEISOqC_internal(par, s(i), r(i));
         end
     end
     fp = struct('xS',[],'yS',[],'zS',[]);
@@ -18,7 +18,7 @@ function fp = fixedPointGLNetEISOqC(par, s, r)
     fp.zS = zS;
 end
 
-function [rhoS,WS,thetaS] = fixedPointGLNetEI_internal(par, s, r)
+function [rhoS,WS,thetaS] = fixedPointGLNetEISOqC_internal(par, s, r)
     sz = getSizeLargestField(par);
     if (s < 0) && (r < 0) % the solution with theta > 0
         rhoS = 1./(par.T .* par.u) + zeros(sz);
@@ -26,7 +26,7 @@ function [rhoS,WS,thetaS] = fixedPointGLNetEI_internal(par, s, r)
         thetaS = par.I + ( (par.J.*par.p-par.q.*WS) - 1./(par.G.*(1-rhoS)) ).*rhoS;
     else
         thetaS = zeros(sz);
-        WS = reshape(getRoot_mex(calc_W_poly_coeff(par,sz),convertToInt(s,r)),sz); % gets root 1,2 or 3 of the polynomial for W
+        WS = reshape(getRoot_mex(calc_W_poly_coeff(par,sz),convertToInt(s,r),1),sz); % gets root 1,2 or 3 of the polynomial for W
         rhoS = (par.A-WS)./(par.u.*WS.*par.T);
     end
     ind = ((imag(rhoS) == 0) & (real(rhoS) <= 1) & (real(rhoS) >= 0)) & ((imag(WS) == 0) & (real(WS) >= 0)) & (real(thetaS) >= 0);

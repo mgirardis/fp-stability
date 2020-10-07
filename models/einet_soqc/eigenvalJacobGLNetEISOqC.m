@@ -18,11 +18,15 @@ function park = get_par_for_single_FP(par,k)
 end
 
 function lambda = eigenvalJacobGLNetEISOqC_internal(par)
-    lambda = getRoots_mex(calc_Lambda_poly_coeff(par),1);
+    sz = getSizeLargestField(par);
+    c = calc_Lambda_poly_coeff(par,sz);
+    nan_idx = find(any(isnan(c),1));
+    c(:,nan_idx) = repmat([1;0;0;0],1,numel(nan_idx));
+    lambda = getRoots_mex(c,1);
+    lambda(:,nan_idx) = NaN;
 end
 
-function c = calc_Lambda_poly_coeff(par)
-    sz = getSizeLargestField(par);
+function c = calc_Lambda_poly_coeff(par,sz)
     c1 = -1+zeros(sz);
     c2 = zeros(sz) + 2+par.G.*(par.zS+(-1).*par.I+par.q.*par.yS.*((-1)+2.*par.xS)+par.J.*(par.p+(-2).*par.p.*par.xS))+(-2).*par.T.^(-1);
     c3 = zeros(sz) + par.T.^(-2).*((-1)+par.T.*(2+2.*par.G.*(par.zS+(-1).*par.I)+2.*par.J.*par.p.*par.G.*((-1)+2.*par.xS).*((-1)+par.T)+(-1).*par.T+(2.*par.G.*par.I+par.G.*par.zS.*((-2)+par.u.*((-1)+par.xS))+par.u.^2.*par.xS.^2).*par.T+par.q.*par.yS.*par.G.*(2.*((-1)+par.T)+par.xS.*(4+((-4)+par.u+(-1).*par.u.*par.xS).*par.T))));

@@ -2,7 +2,7 @@ clearvars
 close all
 
 addpath func
-addpath models\einet_static_model
+addpath models\einet_static
 
 theta = 1;
 J0 = 10;

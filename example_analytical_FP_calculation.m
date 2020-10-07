@@ -2,7 +2,7 @@ clearvars
 close all
 
 addpath func
-addpath models\ktz_model
+addpath models\ktz
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,4 +1,4 @@
-function lambda = eigenvalJacobGLNetEI(par)
+function lambda = eigenvalJacobGLNetEISOqC(par)
     if iscell(par.xS)
         n = numel(par.xS);
         lambda = cell(size(par.xS));

@@ -1,20 +1,24 @@
 function fp = fixedPointGLNetEI(par, s, r)
     if isscalar(s) && isscalar(r)
-        xS = fixedPointKTLog_internal(par, s, r);
+        [xS,yS,zS] = fixedPointKTLog_internal(par, s, r);
     else
         n = max([numel(r),numel(s)]);
         s = ones(1,n).*s;
         r = ones(1,n).*r;
         xS = cell(1,n);
+        yS = cell(1,n);
+        zS = cell(1,n);
         for i = 1:n
-            xS{i} = fixedPointGLNetEI_internal(par, s(i), r(i));
+            [xS{i},yS{i},zS{i}] = fixedPointGLNetEI_internal(par, s(i), r(i));
         end
     end
-    fp = struct('xS',[]);
+    fp = struct('xS',[],'yS',[],'zS',[]);
     fp.xS = xS;
+    fp.yS = yS;
+    fp.zS = zS;
 end
 
-function rhoS = fixedPointGLNetEI_internal(par, s, rootSign)
+function [rhoS,WS,thetaS] = fixedPointGLNetEI_internal(par, s, rootSign)
     % r -> sign of the square root for rho+ or rho-
     A = -1 - par.h.*par.G0 + par.W.*par.G0;
     D = 2.*par.G0.*par.W;

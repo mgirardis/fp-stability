@@ -1,4 +1,4 @@
-function [leftCurveArray,rightCurveArray] = calcStLimitCurveFromManifold(xRange,yRange,z,new_curve_tolerance)
+function [leftCurveArray,rightCurveArray] = calcStLimitCurveFromManifold(xRange,yRange,z,new_curve_tolerance,scan_direction)
 % z      -> matrix, stable FP manifold defined over the domain (xRange,yRange)
 % xRange -> vector, x domain for z
 % yRange -> vector, y domain for z
@@ -7,7 +7,21 @@ function [leftCurveArray,rightCurveArray] = calcStLimitCurveFromManifold(xRange,
 % this function finds the boundary between stable and not stable FP in z
 % from left to right, and top to bottom on the domain (x,y)
     if (nargin < 4) || isempty(new_curve_tolerance)
-        new_curve_tolerance = 1; % if a point col idx is new_curve_tolerance away from any of the curves, add another curve
+        % new_curve_tolerance(1) = tolerance for horizontal (x) axis
+        % new_curve_tolerance(2) = tolerance for vertical (y) axis
+        new_curve_tolerance = [1,1]; % if a point col idx is new_curve_tolerance away from any of the curves, add another curve
+    end
+    if (nargin < 5) || isempty(scan_direction)
+        scan_direction = 'vert'; % 'vert' or 'horiz' % scans figure horizontally or vertically
+    end
+    assert(any(strcmpi(scan_direction,{'vert','horiz'})),'scan_direction must be either ''horiz'' or ''vert''');
+    if strcmpi(scan_direction,'horiz')
+        z = z';
+    end
+    if isscalar(new_curve_tolerance)
+        new_curve_tolerance = [new_curve_tolerance,new_curve_tolerance];
+    else
+        new_curve_tolerance = new_curve_tolerance(1:2);
     end
     
     nan2ones = @(z_line) 1-2.*double(isnan(z_line));
@@ -35,6 +49,19 @@ function [leftCurveArray,rightCurveArray] = calcStLimitCurveFromManifold(xRange,
     end
     leftCurveArray(1)=[];
     rightCurveArray(1)=[];
+    
+    if strcmpi(scan_direction,'horiz')
+        leftCurveArray = invertCurves(leftCurveArray);
+        rightCurveArray = invertCurves(rightCurveArray);
+    end
+end
+
+function c = invertCurves(c)
+    for i = 1:numel(c)
+        xx = c(i).x;
+        c(i).x = c(i).y;
+        c(i).y = xx;
+    end
 end
 
 function [curveArr,row_idx,col_idx] = add_points_to_curve(curveArr,kmain,row_idx,col_idx,new_curve_tolerance,kcompl,xRange,y,i)
@@ -52,7 +79,7 @@ function [curveArr,row_idx,col_idx] = add_points_to_curve(curveArr,kmain,row_idx
 end
 
 function n = getClosestCurve(i,k,row_idx,col_idx,new_curve_tolerance,complBoundIdx)
-    n = find((abs(k - col_idx)<=new_curve_tolerance) & (abs(i - row_idx)<=new_curve_tolerance),1);
+    n = find((abs(k - col_idx)<=new_curve_tolerance(1)) & (abs(i - row_idx)<=new_curve_tolerance(2)),1);
     if isempty(n)
         n = numel(col_idx)+1;
     end

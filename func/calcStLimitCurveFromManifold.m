@@ -18,8 +18,8 @@ function [leftCurveArray,rightCurveArray] = calcStLimitCurveFromManifold(xRange,
     rightCurveArray = curve([],[]);
     lc_col_idx = NaN; % last col index added to each curve in leftCurveArray
     rc_col_idx = NaN; % last col index added to each curve in rightCurveArray
-    lc_row_idx = NaN; % last col index added to each curve in leftCurveArray
-    rc_row_idx = NaN; % last col index added to each curve in rightCurveArray
+    lc_row_idx = NaN; % last row index added to each curve in leftCurveArray
+    rc_row_idx = NaN; % last row index added to each curve in rightCurveArray
     for i = 1:m % for each line in z
         kl = find(leftBoundary(z(i,:))); % finds all the indices for left boundaries
         kr = find(rightBoundary(z(i,:))); % finds all the indices for right boundaries
@@ -33,11 +33,13 @@ function [leftCurveArray,rightCurveArray] = calcStLimitCurveFromManifold(xRange,
             [rightCurveArray,rc_row_idx,rc_col_idx] = add_points_to_curve(rightCurveArray,kr,rc_row_idx,rc_col_idx,new_curve_tolerance,kl,xRange,yRange(i),i);
         end
     end
+    leftCurveArray(1)=[];
+    rightCurveArray(1)=[];
 end
 
 function [curveArr,row_idx,col_idx] = add_points_to_curve(curveArr,kmain,row_idx,col_idx,new_curve_tolerance,kcompl,xRange,y,i)
     for k = kmain
-        n = getClosestCurve(k,row_idx,col_idx,new_curve_tolerance,kcompl,i);
+        n = getClosestCurve(i,k,row_idx,col_idx,new_curve_tolerance,kcompl);
         if n > numel(curveArr)
             curveArr = expandVector(curveArr,1,curve([],[]));
             col_idx(end+1) = NaN;
@@ -49,18 +51,22 @@ function [curveArr,row_idx,col_idx] = add_points_to_curve(curveArr,kmain,row_idx
     end
 end
 
-function n = getClosestCurve(k,row_idx,col_idx,new_curve_tolerance,complBoundIdx,i)
-    [delta_idx,n] = min(abs(k - col_idx));
-    mm = minmax([k,col_idx(n)]);
-    if (delta_idx > new_curve_tolerance) && any(  (complBoundIdx > mm(1)) & (complBoundIdx < mm(2)) )
-        % we only start a new curve if there is one complementary curve in between k and col_idx(n) that minimizes the distance between k and col_idx
-        n = numel(col_idx)+1;
-        return
-    end
-    if abs(row_idx(n)-i) > new_curve_tolerance
-        % we add a new curve if the curves are separated along the vertical direction as well
+function n = getClosestCurve(i,k,row_idx,col_idx,new_curve_tolerance,complBoundIdx)
+    n = find((abs(k - col_idx)<=new_curve_tolerance) & (abs(i - row_idx)<=new_curve_tolerance),1);
+    if isempty(n)
         n = numel(col_idx)+1;
     end
+%     [delta_idx,n] = min(abs(k - col_idx));
+%     mm = minmax([k,col_idx(n)]);
+%     if (delta_idx > new_curve_tolerance) && any(  (complBoundIdx > mm(1)) & (complBoundIdx < mm(2)) )
+%         % we only start a new curve if there is one complementary curve in between k and col_idx(n) that minimizes the distance between k and col_idx
+%         n = numel(col_idx)+1;
+%         return
+%     end
+%     if abs(row_idx(n)-i) > new_curve_tolerance
+%         % we add a new curve if the curves are separated along the vertical direction as well
+%         n = numel(col_idx)+1;
+%     end
 end
 
 function v = expandVector(v,n,el) 

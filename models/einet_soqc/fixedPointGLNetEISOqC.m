@@ -28,6 +28,7 @@ function [rhoS,WS,thetaS] = fixedPointGLNetEISOqC_internal(par, s, r)
         thetaS = zeros(sz);
         WS = reshape(getRoot_mex(calc_W_poly_coeff(par,sz),convertToInt(s,r),1),sz); % gets root 1,2 or 3 of the polynomial for W
         rhoS = (par.A-WS)./(par.u.*WS.*par.T);
+        
     end
     ind = ((imag(rhoS) == 0) & (real(rhoS) <= 1) & (real(rhoS) >= 0)) & ((imag(WS) == 0) & (real(WS) >= 0)) & (real(thetaS) >= 0);
     rhoS(~ind) = NaN;
@@ -40,10 +41,14 @@ function c = calc_W_poly_coeff(par,sz)
     c2 = zeros(sz) + (-1).*par.J.*par.p.*par.G.*(1+par.u.*par.T)+(-1).*par.A.*par.q.*par.G.*(2+par.u.*par.T)+par.u.*par.T.*(1+par.G.*par.I+par.u.*par.G.*par.I.*par.T);
     c3 = zeros(sz) + par.A.*(par.A.*par.q.*par.G+(-1).*par.u.*(1+par.G.*par.I).*par.T+par.J.*par.p.*par.G.*(2+par.u.*par.T));
     c4 = zeros(sz) + (-1).*par.A.^2.*par.J.*par.p.*par.G;
-    if sz(1) == 1
-        c = [c1;c2;c3;c4];
+    if isvector(c1)
+        if sz(1) == 1
+            c = [c1;c2;c3;c4];
+        else
+            c = [c1';c2';c3';c4'];
+        end
     else
-        c = [c1';c2';c3';c4'];
+        c = [reshape(c1,1,[]);reshape(c2,1,[]);reshape(c3,1,[]);reshape(c4,1,[])];
     end
 end
 

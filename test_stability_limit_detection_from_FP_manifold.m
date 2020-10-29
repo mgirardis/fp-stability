@@ -18,7 +18,7 @@ yRange = linspace(0,5,size(z,1));
 [lca,rca] = calcStLimitCurveFromManifold(xRange,yRange,z);
 
 % plotting the FP manifold
-plotManifoldXY([],xRange,yRange,z);
+plotManifoldXY([],xRange,yRange,z,'imagesc');
 hold(gca,'on')
 
 % plotting the left st lim curves in red

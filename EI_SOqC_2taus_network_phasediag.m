@@ -75,6 +75,8 @@ annotation(fh,'arrow',[0.331785714285714 0.274642857142857],[0.760476190476191 0
 % annotation(fh,'arrow',[cb.Position(1), cb.Position(1)+cb.Position(3)*3.2],cb.Position(2).*ones(1,2));
 % text(ax1,22.5,1060,'$W^*=W_c$','Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14);
 
+saveFigure(gcf, 'fig\phasediag_2taus.png', 'png', false, {}, 600)
+
 return
 
 %% preliminary figures

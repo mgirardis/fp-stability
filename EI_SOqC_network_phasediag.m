@@ -67,6 +67,8 @@ text(ax1,35,700,{'Stochastic', 'oscillations'},'Interpreter','latex','Horizontal
 annotation(fh,'arrow',[cb.Position(1), cb.Position(1)+cb.Position(3)*3.2],(cb.Position(2)+cb.Position(4)/2).*ones(1,2));
 text(ax1,22.5,1550,'$W^*=W_c$','Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14);
 
+saveFigure(gcf, 'fig\phasediag_eq_taus.png', 'png', false, {}, 600)
+
 return
 
 %% preliminary figures

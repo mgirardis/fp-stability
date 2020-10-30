@@ -1,4 +1,4 @@
-function [leftCurveArray,rightCurveArray] = calcStLimitCurveFromManifold(xRange,yRange,z,new_curve_tolerance,scan_direction)
+function [leftCurveArray,rightCurveArray,leftIdxCurveArr,rightIdxCurveArr] = calcStLimitCurveFromManifold(xRange,yRange,z,new_curve_tolerance,scan_direction)
 % z      -> matrix, stable FP manifold defined over the domain (xRange,yRange)
 % xRange -> vector, x domain for z
 % yRange -> vector, y domain for z
@@ -30,6 +30,8 @@ function [leftCurveArray,rightCurveArray] = calcStLimitCurveFromManifold(xRange,
     m = size(z,1);
     leftCurveArray = curve([],[]);
     rightCurveArray = curve([],[]);
+    leftIdxCurveArr = curveidx([],[]); % curve of indices of z that make up the curve in left curve array
+    rightIdxCurveArr = curveidx([],[]);
     lc_col_idx = NaN; % last col index added to each curve in leftCurveArray
     rc_col_idx = NaN; % last col index added to each curve in rightCurveArray
     lc_row_idx = NaN; % last row index added to each curve in leftCurveArray
@@ -40,19 +42,23 @@ function [leftCurveArray,rightCurveArray] = calcStLimitCurveFromManifold(xRange,
         
         % updating curve indices
         if ~isempty(kl)
-            [leftCurveArray,lc_row_idx,lc_col_idx] = add_points_to_curve(leftCurveArray,kl,lc_row_idx,lc_col_idx,new_curve_tolerance,kr,xRange,yRange(i),i);
+            [leftCurveArray,leftIdxCurveArr,lc_row_idx,lc_col_idx] = add_points_to_curve(leftCurveArray,leftIdxCurveArr,kl,lc_row_idx,lc_col_idx,new_curve_tolerance,kr,xRange,yRange(i),i);
         end
         
         if ~isempty(kr)
-            [rightCurveArray,rc_row_idx,rc_col_idx] = add_points_to_curve(rightCurveArray,kr,rc_row_idx,rc_col_idx,new_curve_tolerance,kl,xRange,yRange(i),i);
+            [rightCurveArray,rightIdxCurveArr,rc_row_idx,rc_col_idx] = add_points_to_curve(rightCurveArray,rightIdxCurveArr,kr,rc_row_idx,rc_col_idx,new_curve_tolerance,kl,xRange,yRange(i),i);
         end
     end
     leftCurveArray(1)=[];
     rightCurveArray(1)=[];
+    leftIdxCurveArr(1)=[];
+    rightIdxCurveArr(1)=[];
     
     if strcmpi(scan_direction,'horiz')
         leftCurveArray = invertCurves(leftCurveArray);
         rightCurveArray = invertCurves(rightCurveArray);
+        leftIdxCurveArr = invertCurves(leftIdxCurveArr);
+        rightIdxCurveArr = invertCurves(rightIdxCurveArr);
     end
 end
 
@@ -64,15 +70,17 @@ function c = invertCurves(c)
     end
 end
 
-function [curveArr,row_idx,col_idx] = add_points_to_curve(curveArr,kmain,row_idx,col_idx,new_curve_tolerance,kcompl,xRange,y,i)
+function [curveArr,idxCurveArr,row_idx,col_idx] = add_points_to_curve(curveArr,idxCurveArr,kmain,row_idx,col_idx,new_curve_tolerance,kcompl,xRange,y,i)
     for k = kmain
         n = getClosestCurve(i,k,row_idx,col_idx,new_curve_tolerance,kcompl);
         if n > numel(curveArr)
             curveArr = expandVector(curveArr,1,curve([],[]));
+            idxCurveArr = expandVector(idxCurveArr,1,curveidx([],[]));
             col_idx(end+1) = NaN;
             row_idx(end+1) = NaN;
         end
         curveArr(n) = add_point(curveArr(n),(xRange(k)+xRange(k+1))/2,y);
+        idxCurveArr(n) = add_point_idx(idxCurveArr(n),i,k);
         col_idx(n) = k;
         row_idx(n) = i;
     end
@@ -106,6 +114,15 @@ function c = add_point(c,x,y)
     c.y(end+1) = y;
 end
 
+function c = add_point_idx(c,i,j)
+    c.i(end+1) = i;
+    c.j(end+1) = j;
+end
+
 function s = curve(x,y)
     s = struct('x',x,'y',y);
+end
+
+function s = curveidx(i,j)
+    s = struct('i',i,'j',j);
 end

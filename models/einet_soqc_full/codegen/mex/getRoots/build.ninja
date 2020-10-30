@@ -1,0 +1,58 @@
+# CompilerName=intelcpp19msvcpp2019
+# Mode=optim
+ninja_required_version = 1.3
+
+# Basic folders
+root = .
+builddir = $root\build\win64
+matlabdir = C:\Program Files\Polyspace\R2019b
+startdir = D:\Dropbox\p\neuromat\programas\matlab\fp-stability\models\einet_soqc
+
+# Toolchain information
+cc = icl
+cxx = icl
+linker = link
+linkerxx = link
+
+cflags =  /c /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE -I"$matlabdir\extern\include" -I"$matlabdir\simulink\include" /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /DNDEBUG /fp:strict /I "$root" /I "$startdir" /I "$root\interface" /I "$matlabdir\extern\include" /I "$matlabdir\simulink\include" /I "$matlabdir\rtw\c\src" /I "$matlabdir\rtw\c\src\ext_mode\common" /I "$matlabdir\rtw\c\ert" /I "." -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=getRoots_mex -DHAVESTDIO -DUSE_RTMODEL -DMW_NEEDS_VERSION_H  
+
+cxxflags =   /c /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE -I"$matlabdir\extern\include" -I"$matlabdir\simulink\include" /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /DNDEBUG /fp:strict /I "$root" /I "$startdir" /I "$root\interface" /I "$matlabdir\extern\include" /I "$matlabdir\simulink\include" /I "$matlabdir\rtw\c\src" /I "$matlabdir\rtw\c\src\ext_mode\common" /I "$matlabdir\rtw\c\ert" /I "." -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=getRoots_mex -DHAVESTDIO -DUSE_RTMODEL -DMW_NEEDS_VERSION_H  
+
+ldflags =  /nologo /manifest /INCREMENTAL:NO  /DLL /LIBPATH:"$matlabdir\extern\lib\win64\microsoft" libmx.lib libmex.lib libmat.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  /out:"getRoots_mex.mexw64" /LIBPATH:"$matlabdir\extern\lib\win64\microsoft" libmwlapack.lib libmwblas.lib libemlrt.lib libcovrt.lib libut.lib libmwmathutil.lib 
+
+# Build Rules
+rule cc
+    command = $cc $cflags $in /Fo$out
+
+rule cxx
+    command = $cxx $cxxflags $in /Fo$out
+
+rule link
+    command = $linker @$out.rsp $ldflags
+    rspfile = $out.rsp
+    rspfile_content = $in
+
+rule linkxx
+    command = $linkerxx $in $ldflags
+
+# Build
+build $builddir\rt_nonfinite.obj : cxx $root\rt_nonfinite.cpp
+build $builddir\getRoots_data.obj : cxx $root\getRoots_data.cpp
+build $builddir\getRoots_initialize.obj : cxx $root\getRoots_initialize.cpp
+build $builddir\getRoots_terminate.obj : cxx $root\getRoots_terminate.cpp
+build $builddir\getRoots.obj : cxx $root\getRoots.cpp
+build $builddir\roots.obj : cxx $root\roots.cpp
+build $builddir\eml_int_forloop_overflow_check.obj : cxx $root\eml_int_forloop_overflow_check.cpp
+build $builddir\indexShapeCheck.obj : cxx $root\indexShapeCheck.cpp
+build $builddir\eig.obj : cxx $root\eig.cpp
+build $builddir\anyNonFinite.obj : cxx $root\anyNonFinite.cpp
+build $builddir\schur.obj : cxx $root\schur.cpp
+build $builddir\warning.obj : cxx $root\warning.cpp
+build $builddir\_coder_getRoots_api.obj : cxx $root\interface\_coder_getRoots_api.cpp
+build $builddir\_coder_getRoots_mex.obj : cxx $root\interface\_coder_getRoots_mex.cpp
+build $builddir\getRoots_emxutil.obj : cxx $root\getRoots_emxutil.cpp
+build $builddir\_coder_getRoots_info.obj : cxx $root\interface\_coder_getRoots_info.cpp
+build $builddir\cpp_mexapi_version.obj : cxx $matlabdir\extern\version\cpp_mexapi_version.cpp
+
+# Link
+build $root\getRoots_mex.mexw64 : linkxx $builddir\rt_nonfinite.obj $builddir\getRoots_data.obj $builddir\getRoots_initialize.obj $builddir\getRoots_terminate.obj $builddir\getRoots.obj $builddir\roots.obj $builddir\eml_int_forloop_overflow_check.obj $builddir\indexShapeCheck.obj $builddir\eig.obj $builddir\anyNonFinite.obj $builddir\schur.obj $builddir\warning.obj $builddir\_coder_getRoots_api.obj $builddir\_coder_getRoots_mex.obj $builddir\getRoots_emxutil.obj $builddir\_coder_getRoots_info.obj $builddir\cpp_mexapi_version.obj 

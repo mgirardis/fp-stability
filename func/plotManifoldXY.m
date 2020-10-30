@@ -1,4 +1,4 @@
-function h = plotManifoldXY(ax,xRange,yRange,z,plotFunc,plotProperties)
+function h = plotManifoldXY(ax,xRange,yRange,z,plotFunc,plotProperties,makeNaNTransparent)
     if isempty(ax)
         ax = axes;
     end
@@ -8,6 +8,9 @@ function h = plotManifoldXY(ax,xRange,yRange,z,plotFunc,plotProperties)
     if (nargin < 6) || isempty(plotProperties)
         plotProperties = {};
     end
+    if (nargin < 7) || isempty(makeNaNTransparent)
+        makeNaNTransparent = true;
+    end
     assert(any(strcmpi(plotFunc,{'imagesc','pcolor'})),'plotFunc must be either imagesc or pcolor');
     if strcmpi(plotFunc,'pcolor')
         [xgrid,ygrid] = fix_XY_range_pcolor(xRange,yRange,z);
@@ -16,7 +19,9 @@ function h = plotManifoldXY(ax,xRange,yRange,z,plotFunc,plotProperties)
     else
         [xRange,yRange] = fix_XY_range_imagesc(xRange,yRange,z);
         h=imagesc(ax,xRange,yRange,z);
-        h.AlphaData = ~isnan(z);
+        if makeNaNTransparent
+            h.AlphaData = ~isnan(z);
+        end
         ax.YDir = 'normal';
     end
     if ~isempty(plotProperties)

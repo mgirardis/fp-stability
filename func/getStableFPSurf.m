@@ -1,4 +1,4 @@
-function [fp,p1Range,p2Range,parName] = getStableFPSurf(par,fpFunc,evFunc,fpFuncArgs,LambdaFuncArgs,p1Settings,p2Settings)
+function [fp,p1Range,p2Range,parName,lambda] = getStableFPSurf(par,fpFunc,evFunc,fpFuncArgs,LambdaFuncArgs,p1Settings,p2Settings)
     if (nargin < 4) || isempty(fpFuncArgs)
         fpFuncArgs = {};
     end
@@ -53,6 +53,21 @@ function [fp,p1Range,p2Range,parName] = getStableFPSurf(par,fpFunc,evFunc,fpFunc
     fp.xS(indFPToRem) = [];
     fp.yS(indFPToRem) = [];
     fp.zS(indFPToRem) = [];
+    lambda = reshape_lambda(lambda,size(fp.xS{1}));
+end
+
+function LL = reshape_lambda(L,sz)
+% each L must be defined over the same range as the FP
+    n = size(L{1},1); % number of eigenvalues
+    m = numel(L); % number of FP
+    LL = cell(size(L));
+    for i = 1:m
+        LL{i} = reshape(L{i}(1,:),sz);
+        for j = 2:n
+            LL{i} = cat(3,LL{i},reshape(L{i}(j,:),sz));
+        end
+        L{i} = []; % releasing memory
+    end
 end
 
 function r = getParRange(pSetting)

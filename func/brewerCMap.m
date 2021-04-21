@@ -11,8 +11,10 @@ function c = brewerCMap(N,colorScheme,randColors)
         T = hex2rgb({'#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928'});
     elseif colorScheme == 3
         T = hex2rgb({'#67001f','#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d1e5f0','#92c5de','#4393c3','#2166ac','#053061'});
-    else%if colorScheme == 4
+    elseif colorScheme == 4
         T = hex2rgb({'#84b9ff','#e0d572','#f76a6a'});
+    else%if colorScheme == 5
+        T = hex2rgb({'#84b9ff','#f76a6a','#e0d572'});
     end
     nBase = size(T,1);
     if N <= nBase

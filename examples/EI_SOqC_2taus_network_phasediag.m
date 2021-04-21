@@ -56,8 +56,9 @@ lh_ns = plot(ax1,lca.x,lca.y,'-k','LineWidth',2,'DisplayName','N-S bifurcation')
 lh_ac = plot(ax1,A_c(par,p2Range(:,2)),p2Range(:,2),'--r','LineWidth',2,'DisplayName','$A_c$');
 colormap(fh,[0.9.*ones(1,3);brewerCMap(100,4)]);%colormap(fh,[0.8.*ones(1,3);brewerCMap(100,4)])
 cb=colorbar(ax1,'Position', [0.14 0.5 0.014167 0.21286],'AxisLocation','in');
-set(cb,'Ticks',minmax(cb.Ticks),'TickLabels',{'supercritical','quasicritical'});
-set(cb.Label,'String','$W^*$','Rotation',0,'FontSize',16,'Interpreter','latex','Position',[0.367,25.98,0]);
+set(cb,'Ticks',minmax(cb.Ticks),'TickLabels',{[cb.TickLabels{1},' (super)'],[cb.TickLabels{end},' (SOqC)']},'TickLabelInterpreter','latex','FontSize',11);
+set(cb.Title,'String','$\theta^*$','Rotation',0,'FontSize',16,'Interpreter','latex');%,'Position',[0.367,25.98,0]);
+cb.Title.Position(1)=cb.Title.Position(1)+5;
 set(ax1,'CLim',minmax(fp.(fp_to_plot){1}(:)'),'XTick',20:5:40,'YTick',unique([100,0:500:2000]));
 ax1.YTickLabel = ax1.YTick./1e2;
 xlabel('$A$','Interpreter','latex','FontSize',18);
@@ -75,7 +76,75 @@ annotation(fh,'arrow',[0.331785714285714 0.274642857142857],[0.760476190476191 0
 % annotation(fh,'arrow',[cb.Position(1), cb.Position(1)+cb.Position(3)*3.2],cb.Position(2).*ones(1,2));
 % text(ax1,22.5,1060,'$W^*=W_c$','Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14);
 
-saveFigure(gcf, '..\fig\phasediag_2taus.png', 'png', false, {}, 600)
+saveFigure(gcf, '..\fig\phasediag_2taus_thetaS_color', 'png', false, {}, 600)
+
+%%
+
+fp_to_plot = 'xS';
+
+
+fh = figure('Renderer','opengl');
+ax1 = axes;
+ih = plotManifoldXY(ax1,p1Range,p2Range,fp.(fp_to_plot){1},'imagesc',{},false);hold(ax1,'on');
+lh_ns = plot(ax1,lca.x,lca.y,'-k','LineWidth',2,'DisplayName','N-S bifurcation');
+lh_ac = plot(ax1,A_c(par,p2Range(:,2)),p2Range(:,2),'--r','LineWidth',2,'DisplayName','$A_c$');
+colormap(fh,[0.9.*ones(1,3);flipud(brewerCMap(100,4))]);%colormap(fh,[0.8.*ones(1,3);brewerCMap(100,4)])
+cb=colorbar(ax1,'Position', [0.14 0.5 0.014167 0.21286],'AxisLocation','in');
+set(cb,'Ticks',minmax(cb.Ticks),'TickLabels',{[cb.TickLabels{1},' ($\rho^*\sim\rho_c$)'],[cb.TickLabels{end},' (super)']},'TickLabelInterpreter','latex','FontSize',11);
+set(cb.Title,'String','$\rho^*$','Rotation',0,'FontSize',16,'Interpreter','latex');%,'Position',[0.367,25.98,0]);
+cb.Title.Position(1)=cb.Title.Position(1)+5;
+set(ax1,'CLim',minmax(fp.(fp_to_plot){1}(:)'),'XTick',20:5:40,'YTick',unique([100,0:500:2000]));
+ax1.YTickLabel = ax1.YTick./1e2;
+xlabel('$A$','Interpreter','latex','FontSize',18);
+ylabel('$\tau_\theta\,\,\,(10^2)$','Interpreter','latex','FontSize',18);
+parTxt = strrep(strrep(strrep(getParamString(par,-2),'I','I^{\rm ext}'),'G','\Gamma'),'tauW','\tau_w');
+text(ax1,lh_ac.XData(end-10),lh_ac.YData(end-10),'$A=A_c$','FontSize',14,'Interpreter','latex','Rotation',-60,'HorizontalAlignment','left','VerticalAlignment','top','Color','r');
+text(ax1,lca.x(1),lca.y(1),'N-S line','FontSize',14,'Interpreter','latex','Rotation',-10,'HorizontalAlignment','right','VerticalAlignment','top');
+text(ax1,20.5,140,parTxt,'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','bottom','FontSize',14)
+text(ax1,27,900,'Periodic oscillations','Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','top','FontSize',16,'Rotation',-30);
+text(ax1,36,1900,{'Stochastic', 'oscillations'},'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','top','FontSize',16,'Rotation',-30);
+text(ax1,25.9,1600,{'Quasicritical','fluctuations'},'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','middle','FontSize',16,'Rotation',-42);
+text(ax1,30.44,950,{'$\rho^*\sim\rho_c$','$W^*\sim W_c$','$\theta^*\sim I^{\rm ext}$'},'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','bottom','FontSize',16,'Rotation',-23);
+% annotation(fh,'arrow',[0.739642857142856 0.843214285714285],[0.410000000000003 0.369047619047619]);
+annotation(fh,'arrow',[0.331785714285714 0.274642857142857],[0.760476190476191 0.884285714285715]);
+% annotation(fh,'arrow',[cb.Position(1), cb.Position(1)+cb.Position(3)*3.2],cb.Position(2).*ones(1,2));
+% text(ax1,22.5,1060,'$W^*=W_c$','Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14);
+
+saveFigure(gcf, '..\fig\phasediag_2taus_rhoS_color', 'png', false, {}, 600)
+
+%%
+
+fp_to_plot = 'yS';
+
+
+fh = figure('Renderer','opengl');
+ax1 = axes;
+ih = plotManifoldXY(ax1,p1Range,p2Range,fp.(fp_to_plot){1},'imagesc',{},false);hold(ax1,'on');
+lh_ns = plot(ax1,lca.x,lca.y,'-k','LineWidth',2,'DisplayName','N-S bifurcation');
+lh_ac = plot(ax1,A_c(par,p2Range(:,2)),p2Range(:,2),'--r','LineWidth',2,'DisplayName','$A_c$');
+colormap(fh,[0.9.*ones(1,3);flipud(brewerCMap(100,4))]);%colormap(fh,[0.8.*ones(1,3);brewerCMap(100,4)])
+cb=colorbar(ax1,'Position', [0.14 0.5 0.014167 0.21286],'AxisLocation','in');
+set(cb,'Ticks',minmax(cb.Ticks),'TickLabels',{[cb.TickLabels{1},' ($W^*\sim W_c$)'],[cb.TickLabels{end},' (super)']},'TickLabelInterpreter','latex','FontSize',11);
+set(cb.Title,'String','$W^*$','Rotation',0,'FontSize',16,'Interpreter','latex');%,'Position',[0.367,25.98,0]);
+cb.Title.Position(1)=cb.Title.Position(1)+5;
+set(ax1,'CLim',minmax(fp.(fp_to_plot){1}(:)'),'XTick',20:5:40,'YTick',unique([100,0:500:2000]));
+ax1.YTickLabel = ax1.YTick./1e2;
+xlabel('$A$','Interpreter','latex','FontSize',18);
+ylabel('$\tau_\theta\,\,\,(10^2)$','Interpreter','latex','FontSize',18);
+parTxt = strrep(strrep(strrep(getParamString(par,-2),'I','I^{\rm ext}'),'G','\Gamma'),'tauW','\tau_w');
+text(ax1,lh_ac.XData(end-10),lh_ac.YData(end-10),'$A=A_c$','FontSize',14,'Interpreter','latex','Rotation',-60,'HorizontalAlignment','left','VerticalAlignment','top','Color','r');
+text(ax1,lca.x(1),lca.y(1),'N-S line','FontSize',14,'Interpreter','latex','Rotation',-10,'HorizontalAlignment','right','VerticalAlignment','top');
+text(ax1,20.5,140,parTxt,'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','bottom','FontSize',14)
+text(ax1,27,900,'Periodic oscillations','Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','top','FontSize',16,'Rotation',-30);
+text(ax1,36,1900,{'Stochastic', 'oscillations'},'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','top','FontSize',16,'Rotation',-30);
+text(ax1,25.9,1600,{'Quasicritical','fluctuations'},'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','middle','FontSize',16,'Rotation',-42);
+text(ax1,30.44,950,{'$\rho^*\sim\rho_c$','$W^*\sim W_c$','$\theta^*\sim I^{\rm ext}$'},'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','bottom','FontSize',16,'Rotation',-23);
+% annotation(fh,'arrow',[0.739642857142856 0.843214285714285],[0.410000000000003 0.369047619047619]);
+annotation(fh,'arrow',[0.331785714285714 0.274642857142857],[0.760476190476191 0.884285714285715]);
+% annotation(fh,'arrow',[cb.Position(1), cb.Position(1)+cb.Position(3)*3.2],cb.Position(2).*ones(1,2));
+% text(ax1,22.5,1060,'$W^*=W_c$','Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14);
+
+saveFigure(gcf, '..\fig\phasediag_2taus_WS_color', 'png', false, {}, 600)
 
 return
 

@@ -51,7 +51,7 @@ ax1 = axes;
 ih = plotManifoldXY(ax1,p1Range,p2Range,fp.yS{1},'imagesc',{},false);hold(ax1,'on');
 lh_ns = plot(ax1,lca.x,lca.y,'-k','LineWidth',2,'DisplayName','N-S bifurcation');
 lh_ac = plot(ax1,A_c(par,p2Range(:,2),p2Range(:,2)),p2Range(:,2),'--r','LineWidth',2,'DisplayName','$A_c$');
-colormap(fh,[0.9.*ones(1,3);flipud(brewerCMap(100,4))]);%colormap(fh,[0.8.*ones(1,3);brewerCMap(100,4)])
+colormap(fh,[0.9.*ones(1,3);flipud(brewerCMap(100,5))]);%colormap(fh,[0.8.*ones(1,3);brewerCMap(100,4)])
 cb=colorbar(ax1,'Position', [0.179 0.61 0.014167 0.21286]);
 set(cb.Label,'String','$W^*$','Rotation',0,'FontSize',16,'Interpreter','latex','Position',[0.367,20.98,0]);
 set(ax1,'CLim',minmax(fp.yS{1}(:)'),'XTick',20:5:40,'YTick',unique([100,0:500:2000]));
@@ -62,12 +62,12 @@ parTxt = strrep(strrep(getParamString(par,-2),'I','I^{\rm ext}'),'G','\Gamma');
 text(ax1,lh_ac.XData(end-10),lh_ac.YData(end-10),'$A=A_c$','FontSize',14,'Interpreter','latex','Rotation',90,'HorizontalAlignment','right','VerticalAlignment','bottom','Color','r');
 text(ax1,lh_ns.XData(10),lh_ac.YData(10),'N-S line','FontSize',14,'Interpreter','latex','Rotation',15,'HorizontalAlignment','left','VerticalAlignment','bottom');
 text(ax1,20.5,1150,parTxt,'Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14)
-text(ax1,24,700,{'Dragon-king','avalanches'},'Interpreter','latex','HorizontalAlignment','center','VerticalAlignment','top','FontSize',16);
+text(ax1,24,700,{'Periodic','oscillations'},'Interpreter','latex','HorizontalAlignment','center','VerticalAlignment','top','FontSize',16);
 text(ax1,35,700,{'Stochastic', 'oscillations'},'Interpreter','latex','HorizontalAlignment','center','VerticalAlignment','top','FontSize',16);
 annotation(fh,'arrow',[cb.Position(1), cb.Position(1)+cb.Position(3)*3.2],(cb.Position(2)+cb.Position(4)/2).*ones(1,2));
 text(ax1,22.5,1550,'$W^*=W_c$','Interpreter','latex','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14);
 
-saveFigure(gcf, '..\fig\phasediag_eq_taus.png', 'png', false, {}, 600)
+saveFigure(gcf, '..\fig\phasediag_eq_taus', 'png', false, {}, 600)
 
 return
 

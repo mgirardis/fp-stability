@@ -17,7 +17,7 @@ addpath ../models/ktz
 par = getKTzParamStruct(0.6,0.2,0,0,0,linspace(-0.15,0.15,1000));
 
 %% calculates the FP of the KTtanh map
-fp = getFixedPoints(par,@fixedPointKTTanh,@eigenvalJacobKTTanh);
+fp = getFixedPoints(par,@fixedPointKTTanh,@eigenvalJacobKTTanh,[],[],[],[],[],true); % true because y == x in this model
 
 %% plots the calculated FP 
 [~,~,ax] = plotFPStruct([],fp); % this function does the magic of plotting the FP :)
@@ -36,7 +36,7 @@ title(ax,'Bifurcation over H for KT Tanh map');
 par = getKTzParamStruct(0.6,0.1,0.001,0.001,linspace(-0.8,0,1000),0);
 
 %% calculates the FP of the KTztanh map
-fp = getFixedPoints(par,@fixedPointKTzTanh,@eigenvalJacobKTzTanh);
+fp = getFixedPoints(par,@fixedPointKTzTanh,@eigenvalJacobKTzTanh,[],[],[],[],[],true); % true because y == x in this model
 
 %% plots the calculated FP 
 [~,~,ax] = plotFPStruct([],fp); % this function does the magic of plotting the FP :)

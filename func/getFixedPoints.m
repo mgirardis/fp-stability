@@ -1,4 +1,4 @@
-function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames)
+function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames,bif_param_name,bif_param_values,y_equals_x)
 % par -> a struct with the parameters of the model (one of which may be a vector to use as a parameter for bifurcation)
 % fp -> a struct with fields xS,yS,zS or a function handle to a function that returns xS,yS,zS (yS and zS are not necessary)
 %     if fp is a truct:
@@ -12,7 +12,10 @@ function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames)
 %     if Lambda is a numeric array, it must match the size of xS
 % fpFuncArgs -> a cell of additional arguments to be passed to fp(par,fpFuncArgs{:}) if fp is function_handle
 % LambdaFuncArgs -> a cell of additional arguments to be passed to Lambda(par,LambdaFuncArgs{:}) if Lambda is function_handle
-%
+% fpNames -> char vector containing a comma separated list of the names of the fixed points
+% bif_param_name -> the name of the bifurcation parameter (must be a field in par; overrides par); if not given, we try to automatically estimate one from par
+% bif_param_values -> values of the bifurcation parameter (if not given in par; overrides par, must come with the name in bif_param_name)
+% y_equals_x -> true for KT(z) models; but false in general (this is just a reminiscent feature from my studies with the KT family of models)
     if (nargin < 4) || isempty(fpFuncArgs)
         fpFuncArgs = {};
     end
@@ -22,10 +25,23 @@ function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames)
     if (nargin < 6) || isempty(fpNames)
         fpNames = 'x^*,y^*,z^*';
     end
+    if (nargin < 7) || isempty(bif_param_name)
+        bif_param_name = '';
+    end
+    if (nargin < 8) || isempty(bif_param_values)
+        bif_param_values = [];
+    end
+    if (nargin < 9) || isempty(y_equals_x)
+        y_equals_x = false;
+    end
     assert(isValidFP(fp),'Invalid value for fp: it must be either a struct with fields xS,yS,zS or a function handle that returns fp struct with fields xS,yS,zS');
     assert(isValidEV(Lambda),'Invalid value for Lambda: it must be either a numeric matrix (num of lines must match the dimension of the FP) or a function handle that returns a FP_dim X n matrix')
     
-    [bif_param,bif_param_name] = GetBifPar(par);
+    if isempty(bif_param_name)
+        [bif_param_values,bif_param_name] = GetBifPar(par);
+    else
+        par.(bif_param_name) = bif_param_values;
+    end
     
     if isa(fp,'function_handle')
         fp = fp(par,fpFuncArgs{:});
@@ -60,7 +76,7 @@ function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames)
         end
         % this is where the trick happens
         % we just use FP that are not NaN's
-        [xx,yy,zz,pp,ee,tt] = splitFP_EV(fp.xS{j}(~k),fp.yS{j}(~k),fp.zS{j}(~k),bif_param(~k),Lambda{j}(:,~k),parWindow);
+        [xx,yy,zz,pp,ee,tt] = splitFP_EV(fp.xS{j}(~k),fp.yS{j}(~k),fp.zS{j}(~k),bif_param_values(~k),Lambda{j}(:,~k),parWindow);
         
         % just separate the fp returned by the above function into their own cell
         x = expandVector(x,xx);
@@ -77,7 +93,9 @@ function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames)
 %         t((numel(t)+1):(numel(t)+numel(tt))) = tt;
     end
 
-    y = x; % y* = x* in KT(z)
+    if y_equals_x
+        y = x; % y* = x* in KT(z)
+    end
     fp = struct('xS', x, 'yS', y, 'zS', z, 'ev', e, 'type', t, 'par', p, 'parName', bif_param_name, 'fpName', fpName, 'fixedParam', par);
     fp = eliminateEqualFP(fp);
 end

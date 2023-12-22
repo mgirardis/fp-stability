@@ -1,7 +1,7 @@
 function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames,bif_param_name,bif_param_values,y_equals_x)
 % par -> a struct with the parameters of the model (one of which may be a vector to use as a parameter for bifurcation)
 % fp -> a struct with fields xS,yS,zS or a function handle to a function that returns xS,yS,zS (yS and zS are not necessary)
-%     if fp is a truct:
+%     if fp is a struct:
 %         fp.xS -> a numeric array with the values of the FP xS over the parameter range spanned by par
 %                  or a cell array, in which each cell is a different FP on top of the range spanned by par
 %                  (the same applies for yS and zS if they are present)
@@ -43,8 +43,10 @@ function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames,bif
         par.(bif_param_name) = bif_param_values;
     end
     
+    fpFunc     = @(x,y)x;
     if isa(fp,'function_handle')
-        fp = fp(par,fpFuncArgs{:});
+        fpFunc = fp;
+        fp     = fpFunc(par,fpFuncArgs{:});
     end
     fp = ensure_cell_fp(ensure_yS_zS(fp));
     

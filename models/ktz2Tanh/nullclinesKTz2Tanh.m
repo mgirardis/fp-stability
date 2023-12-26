@@ -33,7 +33,7 @@ function n = nullclineX(K,T,H,Z,x)
     if isnan(x)
         n = @(x) K.*tanh((x+H)./T) - x - Z + T.*atanh(x);
     else
-        n = K.*tanh((x+H)./T) - x + T.*atanh(x);
+        n = K.*tanh((x+H)./T) - x - Z + T.*atanh(x);
     end
 end
 

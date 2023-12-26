@@ -1,4 +1,4 @@
-function [KSt,TSt] = find_KT2Tanh_StabLimMod(par,K_range,T_values,n_iter,KTol,n_IC,tTrans,tTotal,xTol,t_sample)
+function [KSt,TSt] = find_KT2Tanh_StabLimMod_H0Q0(par,K_range,T_values,n_iter,KTol,n_IC,tTrans,tTotal,xTol,t_sample)
     if (nargin < 4) || isempty(n_iter)
         n_iter = 30;
     end

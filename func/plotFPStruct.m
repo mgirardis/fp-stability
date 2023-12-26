@@ -131,8 +131,9 @@ function [h,hEV,axhFP,evAx] = plotFPStruct_internal(axhFP, fp, lineSt, plotEV, u
     end
     h = {};
     hold(axhFP, 'all')
-    haveHandleVis = false;
-    hvis = 'off';
+    %haveHandleVis = false;
+    %hvis = 'off';
+    hvis = 'on';
     for i = 1:numel(fp)
         if ~showUnstable && ~strcmp(fp(i).type, 'stable') 
             continue;
@@ -146,13 +147,13 @@ function [h,hEV,axhFP,evAx] = plotFPStruct_internal(axhFP, fp, lineSt, plotEV, u
         end
         [x,y,ls] = getFPCurves(xAxisScaleFunc(fp(i).par),fp(i).(fpToPlot),fp_down_st_lim,fp_up_st_lim,ls,fp_ud_lim_ls);
         for j = 1:numel(x)
-            if haveHandleVis
-                hvis = 'off';
-            else
-                haveHandleVis = true;
-                hvis = 'on';
-            end
-            h{end+1} = plot(axhFP, x{j}, y{j}, ls{j}, 'LineWidth', 2, 'Color', lineColor, 'HandleVisibility', hvis, plotArgs{i}{:});
+            %if haveHandleVis
+            %    hvis = 'off';
+            %else
+            %    haveHandleVis = true;
+            %    hvis = 'on';
+            %end
+            h{end+1} = plot(axhFP, x{j}, y{j}, ls{j}, 'LineWidth', 2, 'Color', lineColor, 'HandleVisibility', hvis, plotArgs{i}{:},'DisplayName',sprintf('FP%g',i));
         end
         %h{end+1} = plot(axhFP, fp(i).par.*xAxisScale, fp(i).(fpToPlot), ls, 'LineWidth', 2, 'Color', lineColor, plotArgs{i}{:});
     end

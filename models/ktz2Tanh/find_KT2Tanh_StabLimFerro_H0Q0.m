@@ -1,4 +1,4 @@
-function [KSt,TSt] = find_KT2Tanh_StabLimFerro(par,K_values,T_values,n_iter,KTol,n_sub)
+function [KSt,TSt] = find_KT2Tanh_StabLimFerro_H0Q0(par,K_values,T_values,n_iter,KTol,n_sub)
     if (nargin < 4) || isempty(n_iter)
         n_iter = 10;
     end

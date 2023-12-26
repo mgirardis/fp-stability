@@ -1,4 +1,4 @@
-function [KSt,TSt] = find_KT2Tanh_StabLimFerro_bisection(par,K_values,T_values,n_iter,Ktol)
+function [KSt,TSt] = find_KT2Tanh_StabLimFerro_H0Q0_bisection(par,K_values,T_values,n_iter,Ktol)
     if (nargin < 4) || isempty(n_iter)
         n_iter = 10;
     end

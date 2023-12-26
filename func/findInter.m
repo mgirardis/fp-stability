@@ -1,22 +1,30 @@
-function [xI,yI,ind] = findInter(x,y1,y2,useSpline)
+function [xI,yI,ind] = findInter(x,y1,y2,useSpline,x0)
 % interpolate y1-y2 using a cubic spline and returns the x,y in which y1 intersects y2
     if (nargin < 4) || isempty(useSpline)
         useSpline = true;
     end
+    if (nargin < 5) || isempty(x0)
+        x0 = [];
+    end
     if isa(y1,'function_handle')
-        [xI,yI,ind] = findInter_func(x,y1,y2);
+        [xI,yI,ind] = findInter_func(x,y1,y2,x0);
     else
         [xI,yI,ind] = findInter_data(x,y1,y2,useSpline);
     end
 end
 
-function [xI,yI,ind] = findInter_func(x,y1,y2)
+function [xI,yI,ind] = findInter_func(x,y1,y2,x0_input)
     [x0,~,ind] = findInter_data(x,y1(x),y2(x),false);
+    x0 = unique([x0,x0_input]);
     xI = [];
     yI = [];
     for i = 1:numel(x0)
+        %try
         xI(i) = fzero(@(x)y1(x)-y2(x),x0(i),optimset('Display','off'));
         yI(i) = y1(xI(i));
+        %catch
+        %    disp('oi')
+        %end
     end
 end
 

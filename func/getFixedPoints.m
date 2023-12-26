@@ -78,7 +78,11 @@ function fp = getFixedPoints(par,fp,Lambda,fpFuncArgs,LambdaFuncArgs,fpNames,bif
         end
         % this is where the trick happens
         % we just use FP that are not NaN's
+        try
         [xx,yy,zz,pp,ee,tt] = splitFP_EV(fp.xS{j}(~k),fp.yS{j}(~k),fp.zS{j}(~k),bif_param_values(~k),Lambda{j}(:,~k),parWindow);
+        catch
+            disp('oi');
+        end
         
         % just separate the fp returned by the above function into their own cell
         x = expandVector(x,xx);

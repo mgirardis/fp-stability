@@ -10,12 +10,12 @@ function [nn,fp] = nullclinesKT2Tanh(par,x,asFunc)
         x = linspace(-1+1e299*realmin,1-1e299*realmin,10000);
     end
     if asFunc
-        nn.nx = nullclineX(par.K,par.T,par.Z,NaN);
+        nn.nx = nullclineX(par.K,par.T,par.Q,NaN);
         nn.ny = nullclineY(par.T,par.H,NaN);
         fp    = struct('x',[],'y',[]);
         [fp.x,fp.y] = findInter(x,nn.nx,nn.ny);
     else
-        n1 = nullclineX(par.K,par.T,par.Z,x);
+        n1 = nullclineX(par.K,par.T,par.Q,x);
         n2 = nullclineY(par.T,par.H,x);
         nn.nx = n1(:);
         nn.ny = n2(:);
@@ -23,11 +23,11 @@ function [nn,fp] = nullclinesKT2Tanh(par,x,asFunc)
     end
 end
 
-function n = nullclineX(K,T,Z,x)
+function n = nullclineX(K,T,Q,x)
     if isnan(x)
-        n = @(x)(x + Z - T.*atanh(x)) ./ K;
+        n = @(x)(x + Q - T.*atanh(x)) ./ K;
     else
-        n = (x + Z - T.*atanh(x)) ./ K;
+        n = (x + Q - T.*atanh(x)) ./ K;
     end
 end
 

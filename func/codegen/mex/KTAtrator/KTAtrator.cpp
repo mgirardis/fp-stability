@@ -710,7 +710,7 @@ static void KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
   int32_T x0_size[2], real_T nDim, real_T tTrans, real_T tTotal, emxArray_real_T
   *xData);
 static void KTz2TanhIterLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
-  real_T par_d, real_T par_l, real_T par_xR, real_T par_H, real_T par_Z, const
+  real_T par_d, real_T par_l, real_T par_xR, real_T par_H, real_T par_Q, const
   emxArray_real_T *par_I, real_T x_data[], const int32_T x_size[2], real_T t);
 static void KTzLogIterLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
   real_T par_d, real_T par_l, real_T par_xR, real_T par_H, const emxArray_real_T
@@ -732,14 +732,14 @@ static void d_KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
   *par_I, const real_T x0_data[], const int32_T x0_size[2], real_T nDim, real_T
   tTrans, real_T tTotal, emxArray_real_T *xData);
 static void e_KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
-  real_T par_H, real_T par_Z, const emxArray_real_T *par_I, const real_T
+  real_T par_H, real_T par_Q, const emxArray_real_T *par_I, const real_T
   x0_data[], const int32_T x0_size[2], real_T nDim, real_T tTrans, real_T tTotal,
   emxArray_real_T *xData);
 static const mxArray *emlrt_marshallOut(const emxArray_real_T *u);
 static void error(const emlrtStack *sp, const mxArray *b, const mxArray *c,
                   emlrtMCInfo *location);
 static void f_KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
-  real_T par_d, real_T par_l, real_T par_xR, real_T par_H, real_T par_Z, const
+  real_T par_d, real_T par_l, real_T par_xR, real_T par_H, real_T par_Q, const
   emxArray_real_T *par_I, const real_T x0_data[], const int32_T x0_size[2],
   real_T nDim, real_T tTrans, real_T tTotal, emxArray_real_T *xData);
 static void figure(const emlrtStack *sp, emlrtMCInfo *location);
@@ -934,7 +934,7 @@ static void KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
 }
 
 static void KTz2TanhIterLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
-  real_T par_d, real_T par_l, real_T par_xR, real_T par_H, real_T par_Z, const
+  real_T par_d, real_T par_l, real_T par_xR, real_T par_H, real_T par_Q, const
   emxArray_real_T *par_I, real_T x_data[], const int32_T x_size[2], real_T t)
 {
   int32_T i;
@@ -970,7 +970,7 @@ static void KTz2TanhIterLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
   }
 
   st.site = &o_emlrtRSI;
-  x = ((((x_data[0] - par_K * x_data[1]) + x_data[2]) + par_Z) + getParValAt(&st,
+  x = ((((x_data[0] - par_K * x_data[1]) + x_data[2]) + par_Q) + getParValAt(&st,
         par_I, t)) / par_T;
   x_data[0] = muDoubleScalarTanh(x);
   i = x_size[1];
@@ -1566,7 +1566,7 @@ static void d_KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
 }
 
 static void e_KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
-  real_T par_H, real_T par_Z, const emxArray_real_T *par_I, const real_T
+  real_T par_H, real_T par_Q, const emxArray_real_T *par_I, const real_T
   x0_data[], const int32_T x0_size[2], real_T nDim, real_T tTrans, real_T tTotal,
   emxArray_real_T *xData)
 {
@@ -1633,7 +1633,7 @@ static void e_KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
     }
 
     b_st.site = &n_emlrtRSI;
-    x = (((x_data[0] - par_K * x_data[1]) + par_Z) + getParValAt(&b_st, par_I,
+    x = (((x_data[0] - par_K * x_data[1]) + par_Q) + getParValAt(&b_st, par_I,
           static_cast<real_T>(t) + 1.0)) / par_T;
     x_data[0] = muDoubleScalarTanh(x);
     if (2 > static_cast<int8_T>(loop_ub)) {
@@ -1720,7 +1720,7 @@ static void e_KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
     }
 
     b_st.site = &n_emlrtRSI;
-    x = (((x_data[0] - par_K * x_data[1]) + par_Z) + getParValAt(&b_st, par_I,
+    x = (((x_data[0] - par_K * x_data[1]) + par_Q) + getParValAt(&b_st, par_I,
           b_t)) / par_T;
     x_data[0] = muDoubleScalarTanh(x);
     if (2 > static_cast<int8_T>(loop_ub)) {
@@ -1787,7 +1787,7 @@ static void error(const emlrtStack *sp, const mxArray *b, const mxArray *c,
 }
 
 static void f_KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
-  real_T par_d, real_T par_l, real_T par_xR, real_T par_H, real_T par_Z, const
+  real_T par_d, real_T par_l, real_T par_xR, real_T par_H, real_T par_Q, const
   emxArray_real_T *par_I, const real_T x0_data[], const int32_T x0_size[2],
   real_T nDim, real_T tTrans, real_T tTotal, emxArray_real_T *xData)
 {
@@ -1828,7 +1828,7 @@ static void f_KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
     static_cast<int32_T>(tTrans), &emlrtRTEI, sp);
   for (t = 0; t < i; t++) {
     st.site = &h_emlrtRSI;
-    KTz2TanhIterLocal(&st, par_K, par_T, par_d, par_l, par_xR, par_H, par_Z,
+    KTz2TanhIterLocal(&st, par_K, par_T, par_d, par_l, par_xR, par_H, par_Q,
                       par_I, x_data, x_size, static_cast<real_T>(t) + 1.0);
     if (*emlrtBreakCheckR2012bFlagVar != 0) {
       emlrtBreakCheckR2012b(sp);
@@ -1881,7 +1881,7 @@ static void f_KTAtratorLocal(const emlrtStack *sp, real_T par_K, real_T par_T,
   for (t = 0; t < i; t++) {
     b_t = (tTrans + 1.0) + static_cast<real_T>(t);
     st.site = &i_emlrtRSI;
-    KTz2TanhIterLocal(&st, par_K, par_T, par_d, par_l, par_xR, par_H, par_Z,
+    KTz2TanhIterLocal(&st, par_K, par_T, par_d, par_l, par_xR, par_H, par_Q,
                       par_I, x_data, x_size, b_t);
     d = (b_t - tTrans) + 1.0;
     if (d != static_cast<int32_T>(muDoubleScalarFloor(d))) {
@@ -2223,7 +2223,7 @@ void KTAtrator(const emlrtStack *sp, struct0_T *par, const real_T x0_data[],
 
           if (size_tmp[1] != 0) {
             st.site = &e_emlrtRSI;
-            e_KTAtratorLocal(&st, par->K, par->T, par->H, par->Z, par->b_I,
+            e_KTAtratorLocal(&st, par->K, par->T, par->H, par->Q, par->b_I,
                              x0_data, x0_size, static_cast<real_T>(x0_size[1]),
                              tTrans, tTotal, xData);
           } else {
@@ -2263,7 +2263,7 @@ void KTAtrator(const emlrtStack *sp, struct0_T *par, const real_T x0_data[],
             if (size_tmp[1] != 0) {
               st.site = &f_emlrtRSI;
               f_KTAtratorLocal(&st, par->K, par->T, par->d, par->l, par->xR,
-                               par->H, par->Z, par->b_I, x0_data, x0_size,
+                               par->H, par->Q, par->b_I, x0_data, x0_size,
                                static_cast<real_T>(x0_size[1]), tTrans, tTotal,
                                xData);
             } else {

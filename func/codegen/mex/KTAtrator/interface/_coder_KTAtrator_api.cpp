@@ -59,7 +59,7 @@ static void b_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
   emlrtMsgIdentifier *parentId, struct0_T *y)
 {
   emlrtMsgIdentifier thisId;
-  static const char * fieldNames[8] = { "K", "T", "d", "l", "xR", "H", "Z", "I"
+  static const char * fieldNames[8] = { "K", "T", "d", "l", "xR", "H", "Q", "I"
   };
 
   static const int32_T dims = 0;
@@ -84,8 +84,8 @@ static void b_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
   thisId.fIdentifier = "H";
   y->H = c_emlrt_marshallIn(sp, emlrtAlias(emlrtGetFieldR2017b(sp, u, 0, 5, "H")),
     &thisId);
-  thisId.fIdentifier = "Z";
-  y->Z = c_emlrt_marshallIn(sp, emlrtAlias(emlrtGetFieldR2017b(sp, u, 0, 6, "Z")),
+  thisId.fIdentifier = "Q";
+  y->Q = c_emlrt_marshallIn(sp, emlrtAlias(emlrtGetFieldR2017b(sp, u, 0, 6, "Q")),
     &thisId);
   thisId.fIdentifier = "I";
   d_emlrt_marshallIn(sp, emlrtAlias(emlrtGetFieldR2017b(sp, u, 0, 7, "I")),

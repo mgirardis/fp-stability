@@ -15,7 +15,7 @@ function lambda = eigenvalJacobKTTanh_internal(par)
     K = par.K(:)';
     T = par.T(:)';
     H = par.H(:)';
-    %Z = par.Z(:)';
+    %Q = par.Q(:)';
 
     v  = par.xS(:)';
     y  = tanh( (v+H)./T );

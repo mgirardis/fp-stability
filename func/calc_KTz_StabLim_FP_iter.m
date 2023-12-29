@@ -80,7 +80,8 @@ end
 function r = isFP_many_IC(x0,par,tTrans,tTotal,t_sample,xTol,ktIterName)
     r = true;
     for i = 1:numel(x0)
-        xx0 = [ x0(i), x0(i) ];
+        %xx0 = [ x0(i), x0(i) ];
+        xx0 = get_IC(x0,ktIterName);
         x   = KTAtrator_mex(getKTzParamStruct_for_KTAtrator(par),xx0,tTrans,tTotal,ktIterName,'',false,false);
         r   = r && isFP(x(:,1),t_sample,xTol);
     end
@@ -89,4 +90,12 @@ end
 function r = isFP(x,t_sample,xTol)
     ind = (numel(x) - t_sample):numel(x);
     r   = mean(abs(diff([reshape(x(ind(1:(end-1))),1,[]);reshape(x(ind(2:end)),1,[])],1,1))) < xTol;
+end
+
+function x0 = get_IC(x0,ktIterName)
+    if contains(ktIterName,'z')
+        x0 = [x0,x0,x0];
+    else
+        x0 = [x0,x0];
+    end
 end

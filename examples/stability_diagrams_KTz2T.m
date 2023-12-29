@@ -94,24 +94,27 @@ title('H=-0.2; Z=Q=0');
 [KStQ0_1,ind]       = unique([KStQ0_1;KStQ0_2]);
 TStQ0_1             = [TStQ0_1;TStQ0_2];
 TStQ0_1             = TStQ0_1(ind);
-% subcritical Neimark-Sacker
+% homoclinic limit cycle (finite amplitude, infinite period at bifurcation point)
 [KStQ0_3,TStQ0_3]   = find_curve(KSt(n),TSt(n),[0.432976589,0.37070234],[0.43953177,0.3608695652],[],30,1,1e-3,25,30);
 % Unstable fold (upper = "<")
 [KStQ0_4,TStQ0_4]   = find_curve(KSt(n),TSt(n),[0.242876254,0.02],[0.24943,0.0232776],[],20,1,1e-5,25,10);
 % supercritical NS (upper branch FP)
-KStMod = cell2mat(KStMod');
-TStMod = TStMod(:);
+KStModQ0    = cell2mat(KStMod');
+TStModQ0    = TStMod(:);
+TmaxSubNS   = max(TStQ0_3);
+KStModQ0    = KStModQ0(TStModQ0>TmaxSubNS);
+TStModQ0    = TStModQ0(TStModQ0>TmaxSubNS);
 
 write_txt_for_Mathematica('KT2Tanh_stlim_TvsK_H-0.2_Q0.txt',  {'Q'                           ,'H',...
                                                                'K_StLim_FP1_Low_Fold'        ,'T_StLim_FP1_Low_Fold'   ,...
-                                                               'K_StLim_Mod_SubNS'           ,'T_StLim_Mod_SubNS'      ,...
+                                                               'K_StLim_Mod_HomocLC'         ,'T_StLim_Mod_HomocLC'    ,...
                                                                'K_StLim_FP2_UnsFold'         ,'T_StLim_FP2_UnsFold'    ,...
                                                                'K_StLim_Mod_SuperNS_Up'      ,'T_StLim_Mod_SuperNS_Up' },...
-                                                                 {par.Z   ,par.H,...
+                                                                 {par.Q   ,par.H,...
                                                                   KStQ0_1 ,TStQ0_1,...
                                                                   KStQ0_3 ,TStQ0_3,...
                                                                   KStQ0_4 ,TStQ0_4,...
-                                                                  KStMod  ,TStMod
+                                                                  KStModQ0,TStModQ0
                                                                   });
 %% Visualizing the bifurcations for H=-0.2,Q=0
 par  = getKTz2TanhParamStruct(linspace(0.02,1,3000), 0.2, 0, 0, 0, -0.2, 0);
@@ -149,10 +152,10 @@ title(sprintf('V(t); T=%g',par.T));
 
 %% T vs Q=Z stability limit diagram for H=-0.2
 par              = getKTz2TanhParamStruct(0.6,linspace(0.02,1,300), 0, 0,  0, -0.2, 0);
-[KSt,TSt,QSt]=calc_StabLim_KT2Tanh_QTK(par.H,par.K,par.T,false);
+[KSt,TSt,QSt]    = calc_StabLim_KT2Tanh_QTK(par.H,par.K,par.T,false);
 % Z is the external field Q for KT2Tanh
 par              = getKTz2TanhParamStruct(0.6,linspace(0.02,1,300), 0, 0,  0, -0.2, linspace(-0.7,0.7,300));
-[TStMod,QStMod]  = calc_KTz_StabLim_FP_iter(par,'T',par.T,'Z',par.Z,'KT2Tanh',1,30000,40000,50,1e-6);
+[TStMod,QStMod]  = calc_KTz_StabLim_FP_iter(par,'T',par.T,'Q',par.Q,'KT2Tanh',1,30000,40000,50,1e-6);
 
 % isolating curves
 % lower fold (ev: 1,>1): unstable-saddle collision
@@ -170,12 +173,12 @@ TStMod2 = TStMod(:,2);
 
 
 figure;axes;hold on;%plot(matCell2Mat(QSt(:)),TSt,'.');xlabel('Q');ylabel('T');hold on;
-plot(QSt1,TSt1,'-r');
-plot(QSt2,TSt2,'-b');
-plot(QSt3,TSt3,'-m');
-plot(QSt4,TSt4,'-g');
-plot(QStMod,TStMod1,'-y');
-plot(QStMod,TStMod2,'-c');
+plot(QSt1,TSt1,'-r','DisplayName','Low Unstable Fold');
+plot(QSt2,TSt2,'-b','DisplayName','Low DegeFold Stable');
+plot(QSt3,TSt3,'-m','DisplayName','Up DegeFold Stable');
+plot(QSt4,TSt4,'-g','DisplayName','Up Unstable Fold');
+plot(QStMod,TStMod1,'-y','DisplayName','Homoclinic LC');
+plot(QStMod,TStMod2,'-c','DisplayName','Super NS');
 xlabel('Q');ylabel('T');
 
 
@@ -185,7 +188,7 @@ write_txt_for_Mathematica('KT2Tanh_stlim_TvsQ_H-0.2_K0.6.txt',{'K'              
                                                                'T_StLim_FP2_Low_DegeFold_StableSad' ,'Q_StLim_FP2_Low_DegeFold_StableSad' ,...
                                                                'T_StLim_FP3_Up_DegeFold_StableSad'  ,'Q_StLim_FP3_Up_DegeFold_StableSad' ,...
                                                                'T_StLim_FP4_Up_Fold_UnsSad'         ,'Q_StLim_FP4_Up_Fold_UnsSad' ,...
-                                                               'T_StLim_Mod1_Low_SubNS'             ,'Q_StLim_Mod1_Low_SubNS',...
+                                                               'T_StLim_Mod1_Low_HomocLC'           ,'Q_StLim_Mod1_Low_HomocLC',...
                                                                'T_StLim_Mod2_Up_SuperNS'            ,'Q_StLim_Mod2_Up_SuperNS'},...
                                                                  {par.K  ,par.H,...
                                                                   TSt1   ,QSt1,...
@@ -211,7 +214,7 @@ fp2  = arrayfun(@(s)setfield(s,'parName','Q'),fp2);
 text(ax,ax.XLim(1),ax.YLim(2),sprintf('T=%g',par.T),'HorizontalAlignment','left','VerticalAlignment','top');
 % checking limit cycles
 Q_probe = linspace(-0.5,0.2,10);
-x=arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Z',Q))  ,[-0.1,-0.1],0,100,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
+x=arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Q',Q))  ,[-0.1,-0.1],0,100,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
 plot_stacked_attractors([], x, [], [], 20, [], [], [], arrayfun(@(Q)sprintf('$Q=%.4g$',Q),Q_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'})
 title(sprintf('V(t); T=%g',par.T));
 
@@ -223,7 +226,7 @@ fp3  = arrayfun(@(s)setfield(s,'parName','Q'),fp3);
 text(ax,ax.XLim(1),ax.YLim(2),sprintf('T=%g',par.T),'HorizontalAlignment','left','VerticalAlignment','top');
 % checking limit cycles
 Q_probe = linspace(-0.45,0.25,20);
-x=arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Z',Q))  ,[-0.1,-0.1],0,100,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
+x=arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Q',Q))  ,[-0.1,-0.1],0,100,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
 plot_stacked_attractors([], x, [], [], 20, [], [], [], arrayfun(@(Q)sprintf('$Q=%.4g$',Q),Q_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'});
 
 par = getKTz2TanhParamStruct(0.6, 0.65, 0, 0,  0, -0.2, linspace(-0.7,0.4,3000));
@@ -233,7 +236,7 @@ fp4  = arrayfun(@(s)setfield(s,'parName','Q'),fp4);
 text(ax,ax.XLim(1),ax.YLim(2),sprintf('T=%g',par.T),'HorizontalAlignment','left','VerticalAlignment','top');
 % checking limit cycles
 Q_probe = linspace(-0.3,0.15,10);
-x=arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Z',Q))  ,[-0.1,-0.1],0,100,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
+x=arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Q',Q))  ,[-0.1,-0.1],0,100,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
 plot_stacked_attractors([], x, [], [], 20, [], [], [], arrayfun(@(Q)sprintf('$Q=%.4g$',Q),Q_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'})
 
 
@@ -247,14 +250,78 @@ plot_stacked_attractors([], x, [], [], 20, [], [], [], arrayfun(@(Q)sprintf('$Q=
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% creates a set of parameters for the KTztanh map
-% sets K = 0.6, T = 0.2, and H is the parameter over which we will trace the bifurcation diagram
-%par = getKTzParamStruct(0.6,0.1,0.001,0.001,linspace(-0.8,0,1000),0);
-                           %(K  ,  T ,    d,    l,  xR  ,     H, Z)
-par = getKTz2TanhParamStruct(0.6,0.35,0.006,0.004, -0.98,  -0.2, linspace(0.01,1.5,1000));
+% calculates the FP of the KTztanh map
 
-%% calculates the FP of the KTztanh map
+
+                           %(K  ,  T ,    d,    l,  xR  ,     H, Z)
+par = getKTz2TanhParamStruct(0.6,0.35,0.006,0.004, -0.98,  -0.2, linspace(-0.5,0.5,1000));
 fp = getFixedPoints(par,@fixedPointKTz2Tanh,@eigenvalJacobKTz2Tanh,[],[],[],[],[],false); % true because y == x in this model
 
-%% plots the calculated FP 
-[~,~,ax] = plotFPStruct([],fp); % this function does the magic of plotting the FP :)
-title(ax,'Bifurcation over Z for KTz2Tanh map');
+parPhaseDiag     = par;
+parPhaseDiag.T   = linspace(0.02,0.8,300);
+parPhaseDiag.Q   = linspace(-0.5,0.5,300);
+[TStMod_TQ,QStMod_TQ]  = calc_KTz_StabLim_FP_iter(parPhaseDiag,'T',parPhaseDiag.T,'Q',parPhaseDiag.Q,'KTz2Tanh',1,30000,40000,50,1e-6);
+
+x           = arrayfun(@(Q)KTAtrator_mex(getKTzParamStruct_for_KTAtrator(setfield(par,'Q',Q)),-0.1.*ones(1,3),30000,40000,'KTz2Tanh','',false,false),par.Q,'UniformOutput',false);
+lcAmplitude = cell2mat(cellfun(@(xx)minmax(xx(:,1)'),x,'UniformOutput',false)');
+
+% plots the calculated FP 
+[~,~,ax] = plotFPStruct([],fp,[],true,true); % this function does the magic of plotting the FP :)
+hold(ax,'on');
+title(ax,'Bifurcation over Q=Z for KTz2Tanh map');
+fill_between_lines_Y(ax,par.Q,lcAmplitude(:,1)',lcAmplitude(:,2)','k','FaceColor',[1,0,0],'EdgeColor','r','FaceAlpha',0.2);
+
+figure;axes;
+plot(QStMod_TQ,matCell2Mat( TStMod_TQ'),'.');
+xlabel('Q');ylabel('T');
+
+%%
+
+
+parPhaseDiag     = par;
+parPhaseDiag.d   = logspace(-4,-1,300);
+parPhaseDiag.Q   = linspace(-0.5,0.5,300);
+[dStMod_dQ,QStMod_dQ]  = calc_KTz_StabLim_FP_iter(parPhaseDiag,'d',parPhaseDiag.d,'Q',parPhaseDiag.Q,'KTz2Tanh',1,30000,40000,50,1e-6);
+
+dStMod_dQ = matCell2Mat(dStMod_dQ');
+
+[ QStMod_dQ1 ,dStMod_dQ1 ] = remove_nan(QStMod_dQ(:),dStMod_dQ(:,1));
+[ QStMod_dQ2 ,dStMod_dQ2 ] = remove_nan(QStMod_dQ(:),dStMod_dQ(:,2));
+figure;axes;
+plot(QStMod_dQ1,dStMod_dQ1,'-')
+hold on;plot(QStMod_dQ2,dStMod_dQ2,'-');xlabel('Q');ylabel('\delta');set(gca,'YScale','log')
+
+d_probe = logspace(-3,-1,10);
+Q_probe = linspace(-0.2,0.5,10);
+x=arrayfun(@(Q,d)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfields(par_probe,'Q',Q,'d',d))  ,[-0.1,-0.1,-0.1],0,1000,'KTz2Tanh','',true,false),Q_probe,d_probe,'UniformOutput',false);
+plot_stacked_attractors([], x, [], [], 200, [], [], [], arrayfun(@(Q,d)sprintf('$Q=%.4g$\n$\\delta=%.4g$',Q,d),Q_probe,d_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'})
+
+Q_probe = linspace(-0.15,0.1,10);
+par = getKTz2TanhParamStruct(0.6,0.35,0.006,0.004, -0.98,  -0.2, linspace(Q_probe(1),Q_probe(end),1000));
+fp1  = getFixedPoints(par,@fixedPointKTz2Tanh,@eigenvalJacobKTz2Tanh,[],[],[],[],[],false); % true because y == x in this model
+par_probe    = parPhaseDiag;
+par_probe.d  = par.d;
+x=arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par_probe,'Q',Q))  ,[-0.1,-0.1,-0.1],0,1000,'KTz2Tanh','',true,false),Q_probe,'UniformOutput',false);
+[~,~,ax] = plotFPStruct([],fp1,[],true,true); % this function does the magic of plotting the FP :)
+plot_stacked_attractors([], x, [], [], 200, [], [], [], arrayfun(@(Q)sprintf('$Q=%.4g$',Q),Q_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'})
+
+Q_probe = linspace(0.2,0.4,10);
+par = getKTz2TanhParamStruct(0.6,0.35,0.006,0.004, -0.98,  -0.2, linspace(Q_probe(1),Q_probe(end),1000));
+fp2  = getFixedPoints(par,@fixedPointKTz2Tanh,@eigenvalJacobKTz2Tanh,[],[],[],[],[],false); % true because y == x in this model
+par_probe    = parPhaseDiag;
+par_probe.d  = 0.03;
+x=arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par_probe,'Q',Q))  ,[-0.1,-0.1,-0.1],0,1000,'KTz2Tanh','',true,false),Q_probe,'UniformOutput',false);
+[~,~,ax] = plotFPStruct([],fp2,[],true,true); % this function does the magic of plotting the FP :)
+plot_stacked_attractors([], x, [], [], 200, [], [], [], arrayfun(@(Q)sprintf('$Q=%.4g$',Q),Q_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'})
+
+write_txt_for_Mathematica('KTz2Tanh_stlim_deltaVsQ_H-0.2_K0.6_T0.35_l0.004_xR-0.98.txt',...
+                                                               {'Q_StLim_LowFP_HomocLC'  ,'d_StLim_LowFP_HomocLC' ,...
+                                                                'Q_StLim_UpFP_SuperNS'   ,'d_StLim_UpFP_SuperNS' },...
+                                                               { QStMod_dQ1  , dStMod_dQ1,...
+                                                                 QStMod_dQ2  , dStMod_dQ2 },...
+                                                                  getKTzParam_str(parPhaseDiag,{'K','T','l','xR','H'},',',false,'#'));
+
+
+%%
+[KSt_adiabQ,TSt_adiabQ,QSt_adiab ] =  calc_StabLim_KTz2Tanh_Q_Adiabatic(par,linspace(0.02,1,300),linspace(0.02,0.8,300),false);
+[KSt_adiabX,TSt_adiabX,xRSt_adiab] = calc_StabLim_KTz2Tanh_xR_Adiabatic(par,linspace(0.02,1,300),linspace(0.02,0.8,300),false);

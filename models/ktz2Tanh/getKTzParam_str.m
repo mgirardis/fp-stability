@@ -19,11 +19,13 @@ function s = getKTzParam_str(p,fields_to_keep,sep,as_latex,prefix,suffix)
     end
     [~,ind]  = intersect(fieldnames(p),fields_to_keep,'stable');
     c        = [fieldnames(p),cellfun(@num2str,struct2cell(p),'UniformOutput',    false)];
-    s        = [prefix,fix_param_names(strjoin(reshape(arrayfun(@(k)get_param_str(strjoin(c(k,:),'='),as_latex),ind,'UniformOutput',false),1,[]),sep)),suffix];
+    s        = [prefix,fix_param_names(strjoin(reshape(arrayfun(@(k)get_param_str(strjoin(c(k,:),'='),as_latex),ind,'UniformOutput',false),1,[]),sep),as_latex),suffix];
 end
 
-function s = fix_param_names(s)
-    s = strrep(strrep(strrep(s,'d','\delta'),'l','\lambda'),'xR','x_R');
+function s = fix_param_names(s,as_latex)
+    if as_latex
+        s = strrep(strrep(strrep(s,'d','\delta'),'l','\lambda'),'xR','x_R');
+    end
 end
 
 function s = get_param_str(s,as_latex)

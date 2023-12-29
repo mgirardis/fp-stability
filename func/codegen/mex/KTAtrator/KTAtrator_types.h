@@ -46,7 +46,7 @@ struct struct0_T
   real_T l;
   real_T xR;
   real_T H;
-  real_T Z;
+  real_T Q;
   emxArray_real_T *b_I;
 };
 

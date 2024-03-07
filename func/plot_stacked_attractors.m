@@ -1,4 +1,4 @@
-function [ lh, sh, slh, tx, lh_scale, tx_scale, stx ] = plot_stacked_attractors(ax, x, t_ind_of_x, t_ind_shift, t_scale, line_colors, symb_colors, pSymb, panel_txt, plot_line_args, plot_symb_args, plot_txt_args, scale_line_args, scale_txt_args, show_slope, slope_line_args, slope_txt, slope_txt_args)
+function [ lh, sh, slh, tx, lh_scale, tx_scale, stx ] = plot_stacked_attractors(ax, x, t_ind_of_x, t_ind_shift, t_scale, line_colors, symb_colors, pSymb, panel_txt, plot_line_args, plot_symb_args, plot_txt_args, scale_line_args, scale_txt_args, show_slope, slope_line_args, slope_txt, slope_txt_args, t_scale_txt_suffix)
 
     if isempty(ax)
         figure;
@@ -51,6 +51,9 @@ function [ lh, sh, slh, tx, lh_scale, tx_scale, stx ] = plot_stacked_attractors(
     end
     if (nargin < 18) || isempty(slope_txt_args)
         slope_txt_args = {};
+    end
+    if (nargin < 19) || isempty(t_scale_txt_suffix)
+        t_scale_txt_suffix = '';
     end
 
     plot_line_args  = get_cell_set_default(plot_line_args ,'LineWidth',1);
@@ -157,10 +160,12 @@ function [ lh, sh, slh, tx, lh_scale, tx_scale, stx ] = plot_stacked_attractors(
     yLimits = ax.YLim;
     t_ind   = t_ind_of_x{end};
     if use_same_scale
+        t_scale_txt = [ sprintf('%g ts',t_scale), t_scale_txt_suffix ];
         lh_scale = line(ax,[numel(t_ind)-t_scale,numel(t_ind)],get_frac(-0.1,yLimits).*ones(1,2),scale_line_args{:});
-        tx_scale = text(ax,numel(t_ind)-t_scale,get_frac(-0.1,yLimits),sprintf('%g ts',t_scale),scale_txt_args{:});
+        tx_scale = text(ax,numel(t_ind)-t_scale,get_frac(-0.1,yLimits),t_scale_txt,scale_txt_args{:});
     else
-        tx_scale = text(ax,t_transf.f(numel(t_ind)-t_scale,t_transf),get_frac(-0.05,yLimits),sprintf('%g ts',t_scale),scale_txt_args{:});
+        t_scale_txt = [ sprintf('%g ts',t_scale), t_scale_txt_suffix ];
+        tx_scale = text(ax,t_transf.f(numel(t_ind)-t_scale,t_transf),get_frac(-0.05,yLimits),t_scale_txt,scale_txt_args{:});
     end
     axis(ax,'tight');
     axis(ax,'off');

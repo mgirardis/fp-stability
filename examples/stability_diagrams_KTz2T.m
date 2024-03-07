@@ -200,44 +200,99 @@ write_txt_for_Mathematica('KT2Tanh_stlim_TvsQ_H-0.2_K0.6.txt',{'K'              
                                                                   });
                                                           
 %% Visualizing the bifurcations for H=-0.2,K=0.6
+%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% T = 0.1
+%%%%%%%%%%%%%%%%%
 par = getKTz2TanhParamStruct(0.6, 0.1, 0, 0,  0, -0.2, linspace(-0.7,0.4,3000));
 fp1  = getFixedPoints(par,@fixedPointKT2Tanh,@eigenvalJacobKT2Tanh,[],[],[],[],[],false);
-fp1  = arrayfun(@(s)setfield(s,'parName','Q'),fp1);
-[~,~,ax]=plotFPStruct([],fp1,[],true,true);
-text(ax,ax.XLim(2),ax.YLim(2),sprintf('T=%g',par.T),'HorizontalAlignment','right','VerticalAlignment','top');
+fp1  = arrayfun(@(s)setfield(setfield(s,'parName','Q'),'fpName','V^*,y^*,z^*'),fp1);
+%[~,~,ax]=plotFPStruct([],fp1,[],true,true);
+[~,~,ax]=plotFPStruct([],fp1,[],false,false);
+set(ax,'FontSize',12,'Position',[0.4389 0.5881 0.4661 0.3369],'XLim',[-0.65,0.3]);
+fh1=ax.Parent;
+text(ax,ax.XLim(1)+0.1,ax.YLim(2),sprintf('T=%g',par.T),'HorizontalAlignment','left','VerticalAlignment','top','FontSize',12);
+saveFigure(fh1,'bif_over_Q_H-0.2_K0.6_T0.1','png',false,[],100);
 
-
+%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% T = 0.3
+%%%%%%%%%%%%%%%%%
 par = getKTz2TanhParamStruct(0.6, 0.3, 0, 0,  0, -0.2, linspace(-0.7,0.4,3000));
+Q_probe = linspace(-0.5,0.2,100);
+x     = arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Q',Q))  ,[-0.1,-0.1],100,2000,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
+lc_mm = get_limit_cycle_minmax(x,1e-2,1);
 fp2  = getFixedPoints(par,@fixedPointKT2Tanh,@eigenvalJacobKT2Tanh,[],[],[],[],[],false);
-fp2  = arrayfun(@(s)setfield(s,'parName','Q'),fp2);
-[~,~,ax]=plotFPStruct([],fp2,[],true,true);
-text(ax,ax.XLim(1),ax.YLim(2),sprintf('T=%g',par.T),'HorizontalAlignment','left','VerticalAlignment','top');
+fp2  = arrayfun(@(s)setfield(setfield(s,'parName','Q'),'fpName','V^*,y^*,z^*'),fp2);
+%[~,~,ax]=plotFPStruct([],fp2,[],true,true);
+[~,~,ax]=plotFPStruct([],fp2,[],false,false);
+hold(ax,'on');
+ph = fill_between_lines_Y(ax,Q_probe,lc_mm(:,1),lc_mm(:,2),0.75.*ones(1,3));
+uistack(ph,'bottom');
+set(ax,'FontSize',12,'Position',[0.4389 0.5881 0.4661 0.3369],'XLim',[-0.65,0.3]);
+fh1 = ax.Parent;
+text(ax,ax.XLim(1)+0.1,ax.YLim(2),sprintf('T=%g',par.T),'HorizontalAlignment','left','VerticalAlignment','top');
 % checking limit cycles
-Q_probe = linspace(-0.5,0.2,10);
+Q_probe = linspace(-0.5,0.2,15);
 x=arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Q',Q))  ,[-0.1,-0.1],0,100,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
-plot_stacked_attractors([], x, [], [], 20, [], [], [], arrayfun(@(Q)sprintf('$Q=%.4g$',Q),Q_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'})
+llh=plot_stacked_attractors([], x, [], [], 20, [], [], [], arrayfun(@(Q)sprintf('$Q=%.4g$',Q),Q_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'});
 title(sprintf('V(t); T=%g',par.T));
+ax2=llh(1).Parent;
+fh2=ax2.Parent;
+ax2.Position([1,3])=[0.18,0.8];
+saveFigure([fh1,fh2],{'bif_over_Q_H-0.2_K0.6_T0.3','bif_over_Q_H-0.2_K0.6_T0.3_attractors'},'png',false,[],100);
 
-
+%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% T = 0.42
+%%%%%%%%%%%%%%%%%
 par = getKTz2TanhParamStruct(0.6, 0.42, 0, 0,  0, -0.2, linspace(-0.5,0.3,4000));
+Q_probe = linspace(-0.5,0.2,100);
+x     = arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Q',Q))  ,[-0.1,-0.1],100,2000,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
+lc_mm = get_limit_cycle_minmax(x,1e-2,1);
 fp3  = getFixedPoints(par,@fixedPointKT2Tanh,@eigenvalJacobKT2Tanh,[],[],[],[],[],false);
-fp3  = arrayfun(@(s)setfield(s,'parName','Q'),fp3);
-[~,~,ax]=plotFPStruct([],fp3,[],true,true);
-text(ax,ax.XLim(1),ax.YLim(2),sprintf('T=%g',par.T),'HorizontalAlignment','left','VerticalAlignment','top');
+fp3  = arrayfun(@(s)setfield(setfield(s,'parName','Q'),'fpName','V^*,y^*,z^*'),fp3);
+%[~,~,ax]=plotFPStruct([],fp3,[],true,true);
+[~,~,ax]=plotFPStruct([],fp3,[],false,false);
+hold(ax,'on');
+ph = fill_between_lines_Y(ax,Q_probe,lc_mm(:,1),lc_mm(:,2),0.75.*ones(1,3));
+uistack(ph,'bottom');
+set(ax,'FontSize',12,'Position',[0.4389 0.5881 0.4661 0.3369],'XLim',[-0.65,0.3]);
+fh1 = ax.Parent;
+text(ax,ax.XLim(1)+0.1,ax.YLim(2),sprintf('T=%g',par.T),'HorizontalAlignment','left','VerticalAlignment','top');
 % checking limit cycles
 Q_probe = linspace(-0.45,0.25,20);
 x=arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Q',Q))  ,[-0.1,-0.1],0,100,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
-plot_stacked_attractors([], x, [], [], 20, [], [], [], arrayfun(@(Q)sprintf('$Q=%.4g$',Q),Q_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'});
+llh=plot_stacked_attractors([], x, [], [], 20, [], [], [], arrayfun(@(Q)sprintf('$Q=%.4g$',Q),Q_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'});
+title(sprintf('V(t); T=%g',par.T));
+ax2=llh(1).Parent;
+fh2=ax2.Parent;
+ax2.Position([1,3])=[0.18,0.8];
+saveFigure([fh1,fh2],{'bif_over_Q_H-0.2_K0.6_T0.42','bif_over_Q_H-0.2_K0.6_T0.42_attractors'},'png',false,[],100);
 
+%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% T = 0.65
+%%%%%%%%%%%%%%%%%
 par = getKTz2TanhParamStruct(0.6, 0.65, 0, 0,  0, -0.2, linspace(-0.7,0.4,3000));
+Q_probe = linspace(-0.5,0.2,100);
+x     = arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Q',Q))  ,[-0.1,-0.1],100,2000,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
+lc_mm = get_limit_cycle_minmax(x,1e-2,1);
 fp4  = getFixedPoints(par,@fixedPointKT2Tanh,@eigenvalJacobKT2Tanh,[],[],[],[],[],false);
-fp4  = arrayfun(@(s)setfield(s,'parName','Q'),fp4);
-[~,~,ax]=plotFPStruct([],fp4,[],true,true);
-text(ax,ax.XLim(1),ax.YLim(2),sprintf('T=%g',par.T),'HorizontalAlignment','left','VerticalAlignment','top');
+fp4  = arrayfun(@(s)setfield(setfield(s,'parName','Q'),'fpName','V^*,y^*,z^*'),fp4);
+%[~,~,ax]=plotFPStruct([],fp4,[],true,true);
+[~,~,ax]=plotFPStruct([],fp4,[],false,false);
+hold(ax,'on');
+ph = fill_between_lines_Y(ax,Q_probe,lc_mm(:,1),lc_mm(:,2),0.75.*ones(1,3));
+uistack(ph,'bottom');
+set(ax,'FontSize',12,'Position',[0.4389 0.5881 0.4661 0.3369],'XLim',[-0.65,0.3]);
+fh1 = ax.Parent;
+text(ax,ax.XLim(1)+0.1,ax.YLim(2),sprintf('T=%g',par.T),'HorizontalAlignment','left','VerticalAlignment','top');
 % checking limit cycles
-Q_probe = linspace(-0.3,0.15,10);
+Q_probe = linspace(-0.3,0.15,15);
 x=arrayfun(@(Q)KTAtrator_mex(  getKTzParamStruct_for_KTAtrator(setfield(par,'Q',Q))  ,[-0.1,-0.1],0,100,'KT2Tanh','',true,false),Q_probe,'UniformOutput',false);
-plot_stacked_attractors([], x, [], [], 20, [], [], [], arrayfun(@(Q)sprintf('$Q=%.4g$',Q),Q_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'})
+llh=plot_stacked_attractors([], x, [], [], 20, [], [], [], arrayfun(@(Q)sprintf('$Q=%.4g$',Q),Q_probe,'UniformOutput',false),[],[],{'Color','k','HorizontalAlignment','right'});
+title(sprintf('V(t); T=%g',par.T));
+ax2=llh(1).Parent;
+fh2=ax2.Parent;
+ax2.Position([1,3])=[0.18,0.8];
+saveFigure([fh1,fh2],{'bif_over_Q_H-0.2_K0.6_T0.65','bif_over_Q_H-0.2_K0.6_T0.65_attractors'},'png',false,[],100);
 
 
 
@@ -325,3 +380,20 @@ write_txt_for_Mathematica('KTz2Tanh_stlim_deltaVsQ_H-0.2_K0.6_T0.35_l0.004_xR-0.
 %%
 [KSt_adiabQ,TSt_adiabQ,QSt_adiab ] =  calc_StabLim_KTz2Tanh_Q_Adiabatic(par,linspace(0.02,1,300),linspace(0.02,0.8,300),false);
 [KSt_adiabX,TSt_adiabX,xRSt_adiab] = calc_StabLim_KTz2Tanh_xR_Adiabatic(par,linspace(0.02,1,300),linspace(0.02,0.8,300),false);
+
+%% KTz2Tanh attractors paper
+close all
+                                   %(K  ,  T ,  d  ,  l  ,  xR  ,   H  , Z)
+par_panels = [getKTz2TanhParamStruct(0.6,0.35,0.006,0.004, -0.98, -0.5 , 0    ),...
+              getKTz2TanhParamStruct(0.6,0.35,0.006,0.004, -0.98, -0.2 , -0.06),...
+              getKTz2TanhParamStruct(0.6,0.35,0.006,0.004, -0.98, -0.95, 0    ),...
+              getKTz2TanhParamStruct(0.6,0.35,0.006,0.004, -0.98, -0.8 , 0    ),...
+              getKTz2TanhParamStruct(0.7,0.5 ,0.008,0.004, -0.98, -0.9 , 0    ),...
+              getKTz2TanhParamStruct(0.8,0.6 ,0.006,0.004, -0.99, -0.8 , 0    )];
+          
+x=arrayfun(@(pp)KTAtrator_mex(getKTzParamStruct_for_KTAtrator(pp),[-0.1,-0.1,-0.1],1000,2000,'KTz2Tanh','',true,false),par_panels,'UniformOutput',false);
+fig = figure;
+ax  = axes('Position',[0.1,0.1,0.5,0.52]);
+plot_stacked_attractors(ax, x,         [],          [],     200,          [],          [],    [],        [],             [],             [], {'Color','k','HorizontalAlignment','right'},              [], {'HorizontalAlignment','center'},         [],              [],        [],             [], ' = 20 ms');
+%plot_stacked_attractors(ax, x, t_ind_of_x, t_ind_shift, t_scale, line_colors, symb_colors, pSymb, panel_txt, plot_line_args, plot_symb_args,                               plot_txt_args, scale_line_args,                  scale_txt_args, show_slope, slope_line_args, slope_txt, slope_txt_args, t_scale_txt_suffix)
+saveFigure(fig,'ktz2tanh_example_attractors','png',true,[],300);

@@ -1,8 +1,8 @@
 clearvars
 close all
 
-addpath ../func
-addpath ../models/ktz
+addpath func
+addpath models/ktz
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,7 +33,7 @@ title(ax,'Bifurcation over H for KT Tanh map');
 
 %% creates a set of parameters for the KTztanh map
 % sets K = 0.6, T = 0.2, and H is the parameter over which we will trace the bifurcation diagram
-par = getKTzParamStruct(0.6,0.1,0.001,0.001,linspace(-0.8,0,1000),0);
+par = getKTzParamStruct(0.6,0.35,0.001,0.008,-0.7,linspace(0.01,20,1000));
 
 %% calculates the FP of the KTztanh map
 fp = getFixedPoints(par,@fixedPointKTzTanh,@eigenvalJacobKTzTanh,[],[],[],[],[],true); % true because y == x in this model
